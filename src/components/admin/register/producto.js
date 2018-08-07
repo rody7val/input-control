@@ -1,0 +1,305 @@
+import React, { Component } from 'react'
+import firebase from 'firebase'
+import moment from 'moment'
+import FileUpload from '../fileUpload'
+import Select from 'react-select/lib/Creatable';
+import ProductView from '../../productView'
+import { 
+	Button,
+	Form,
+	FormGroup,
+	FormText,
+  CustomInput,
+	Label,
+	Input,
+	InputGroup,
+	InputGroupAddon,
+	Card,
+	CardBody,
+	Badge,
+	Row,
+	Col } from 'reactstrap'
+
+class Producto extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      name: undefined,
+      desc: undefined,
+      img: '/img-card-example.png',
+      _categories: [],
+      categories: [],
+      _providers: [],
+      providers: [],
+      uploadValue: 0,
+      // qty: undefined,
+      // price: undefined,
+      // salePrice: undefined,
+      // viewPrice: false,
+    	// gain: 0
+    }
+
+    this.crear = this.crear.bind(this)
+    this.change = this.change.bind(this)
+    this.onUpload = this.onUpload.bind(this)
+    this.changeCategories = this.changeCategories.bind(this)
+  }
+
+  componentDidMount = () => {
+    this.getCategories()
+    this.getProviders()
+  }
+
+  getCategories = () => {
+    const _categoriesRef = firebase.database().ref().child('categories')
+
+    _categoriesRef.once('value').then(snapshot => {
+      snapshot.forEach(data => {
+        this.setState({
+          _categories: this.state._categories.concat(data.val())
+        })
+      })
+    })
+  }
+
+  getProviders = () => {
+    const _providersRef = firebase.database().ref().child('providers')
+
+    _providersRef.once('value').then(snapshot => {
+      snapshot.forEach(data => {
+        this.setState({
+          _providers: this.state._providers.concat(data.val())
+        })
+      })
+    })
+  }
+
+  setCategory = (category) => {
+    const dbRef = firebase.database().ref('categories')
+    const newCategory = dbRef.push()
+
+    newCategory.set(category).then(() => {
+      console.log('add', category)
+      this.setState({
+        _categories: this.state._categories.concat(category)
+      })
+    }).catch((err) => {
+      alert(err)
+    })
+  }
+
+  setProvider = (provider) => {
+    const dbRef = firebase.database().ref('providers')
+    const newProvider = dbRef.push()
+
+    newProvider.set(provider).then(() => {
+      console.log('add', provider)
+      this.setState({
+        _providers: this.state._providers.concat(provider)
+      })
+    }).catch((err) => {
+      alert(err)
+    })
+  }
+
+  crear(event) {
+  	event.preventDefault()
+    let errors = false;
+
+    const item = {
+      name: this.state.name,
+      desc: this.state.desc,
+      img: this.state.img,
+      categories: this.state.categories,
+      providers: this.state.providers,
+      // qty: this.state.qty,
+      // price: this.state.price,
+      // salePrice: this.state.salePrice,
+      // viewPrice: this.state.viewPrice,
+      created: moment().valueOf()
+    }
+
+    const dbRef = firebase.database().ref('items')
+    const newItem = dbRef.push()
+
+  	newItem.set(item).then(() => {
+      alert('Nuevo producto creado!')
+    }).catch((err) => {
+      errors = true
+      alert(err)
+    })
+
+    if (!errors) {
+  	  // reset state
+      this.setState({
+      	name: undefined,
+      	desc: undefined,
+        img: '/img-card-example.png',
+        categories: [],
+        providers: [],
+      	uploadValue: 0,
+        // qty: undefined,
+        // price: undefined,
+        // salePrice: undefined,
+        // viewPrice: false,
+      	// gain: 0
+      })
+      event.target.reset()
+    }
+    
+  }
+
+  change(event) {
+    const target = event.target
+    const value = target.type === 'checkbox' ? target.checked : target.value
+    const name = target.name
+
+    // if (name === 'salePrice') {
+    // 	//calcular % de ganancia
+    //   let dif = Number(Number(value - this.state.price).toFixed(2));
+    //   let porcentaje = Number(Number(dif / value).toFixed(2));
+    //   this.setState({
+    //   	gain: porcentaje > 0 ? Number(Number(porcentaje * 100).toFixed(2)) : 0
+    //   })
+    // }
+
+    this.setState({
+      [name]: value
+    })
+  }
+
+	onUpload (event) {
+    const file = event.target.files[0]
+    const storageRef = firebase.storage().ref(`/fotos/${file.name}`)
+    const task = storageRef.put(file)
+
+    task.on('state_changed', snapshot => {
+      let percentage = Number(Number((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(0))
+      this.setState({ uploadValue: percentage })
+    }, error => {
+      console.log(error.message)
+    }, () => {  	
+				storageRef.getDownloadURL().then(url => {
+          console.log(url)
+    			this.setState({ img: url })
+				})
+    })
+  }
+
+  changeCategories = (categories) => {
+    let last = categories[categories.length-1] || {}
+
+    if (last.__isNew__) {
+      delete last.__isNew__
+      this.setCategory(last)
+    }
+
+    this.setState({ categories })
+    console.log(categories)
+  }
+
+  changeProviders = (providers) => {
+    let last = providers[providers.length-1] || {}
+
+    if (last.__isNew__) {
+      delete last.__isNew__
+      this.setProvider(last)
+    }
+
+    this.setState({ providers })
+    console.log(providers)
+  }
+
+	render() {
+    // const { categories } = this.state;
+
+		return (
+			<Row>
+				<Col md={8} sm={12}>
+					<br/>
+					<h3>Registrar Producto</h3>
+					<Card>
+						<CardBody>
+							<Form onSubmit={this.crear}>
+      				  <FormGroup>
+      				    <Label for="name">Nombre</Label>
+      				    <Input required onChange={this.change} value={this.state.name} type="text" name="name" id="name" placeholder="Nombre del producto" />
+                </FormGroup>
+                <FormGroup>
+                  <Label for="desc">Descripción</Label>
+                  <Input required onChange={this.change} value={this.state.desc} type='text' name="desc" id="desc"/>
+                </FormGroup>
+                <FormGroup>
+                  <Label for="img">Imagen</Label>
+                  <FileUpload onUpload={this.onUpload} uploadValue={this.state.uploadValue}/>
+                </FormGroup>
+                <FormGroup>
+                  <Label>Proveedores</Label>
+                  <Select
+                    isMulti
+                    value={this.state.providers}
+                    onChange={this.changeProviders}
+                    options={this.state._providers}/>
+                </FormGroup>
+                <FormGroup>
+                  <Label>Categorias</Label>
+                  <Select
+                    isMulti
+                    value={this.state.categories}
+                    onChange={this.changeCategories}
+                    options={this.state._categories}/>
+                </FormGroup>
+      				  <Button color='primary'>Guardar</Button>
+							</Form>
+						</CardBody>
+					</Card>
+				</Col>
+				<Col md={4} sm={12}>
+					<br/>
+					<h3>Vista previa</h3>
+          <ProductView 
+            name={this.state.name}
+            desc={this.state.desc}
+            img={this.state.img}
+            qty={this.state.qty}
+            categories={this.state.categories}/>
+				</Col>
+				<br/>
+			</Row>
+		)
+	}
+}
+
+export default Producto
+
+                  // <Col sm={12} md={6}>
+                    // <FormGroup>
+                      // <Label for="qty">Stock</Label>
+                      // <Input required onChange={this.change} value={this.state.qty} type="number" name="qty" id="qty" placeholder="Cantidad de unidades" />
+                    // </FormGroup>
+                  // </Col>
+                // </Row>
+                // <Row>
+                  // <Col sm={12} md={6}>
+                    // <FormGroup>
+                      // <Label for="price">Pcio. Compra</Label>
+                      // <InputGroup>
+                        // <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                        // <Input required onChange={this.change} value={this.state.price} step='0.05' type="number" name="price" id="price" placeholder="Precio de compra" />
+                      // </InputGroup>
+                    // </FormGroup>
+                  // </Col>
+                  // <Col sm={12} md={6}>
+                    // <FormGroup>
+                      // <Label for="salePrice">Pcio. Venta</Label>
+                      // <InputGroup>
+                        // <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                        // <Input required onChange={this.change} value={this.state.salePrice} step='0.05' type="number" name="salePrice" id="salePrice" placeholder="Precio de venta" />
+                      // </InputGroup>
+                      // <FormText><Badge>{this.state.gain}%</Badge> de ganancia</FormText>
+                    // </FormGroup>
+                  // </Col>
+                // </Row>
+                // <FormGroup>
+                  // <CustomInput onChange={this.change} value={this.state.viewPrice} type='checkbox' name='viewPrice' label='Mostrar Precio' id='viewPrice'/>
+                // </FormGroup>
