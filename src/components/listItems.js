@@ -1,134 +1,127 @@
 import React from 'react';
-import { Link } from 'react-router-dom'
 import firebase from 'firebase';
 import ProductView from './productView'
-import {
-	Button,
-	Row,
-	Col,
-	CardDeck } from 'reactstrap';
-
+import { Button, Row, Col, ButtonGroup } from 'reactstrap';
+import Select from 'react-select/lib/Creatable';
 
 export default class ListItems extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {	
-    	items: [],
-    	loadMore: true,
-    	loading: false,
-    	startAt: 0,
-    	limit: 5
+    this.state = {
+      firstLoading: 'cargando...',
+      items: [],
+      loading: false,
+      loadMore: true,
+      startAt: 0,
+      child: 'name',
+      limit: 5
     }
-    this.loadItems = this.loadItems.bind(this)
   }
 
-	snapshotToArray = (snapshot) => {
+  snapshotToArray = (snapshot) => {
     var returnArr = [];
     snapshot.forEach(function(childSnapshot) {
-        var item = childSnapshot.val();
-        item.key = childSnapshot.key;
-        returnArr.push(item);
+      var item = childSnapshot.val();
+      item.key = childSnapshot.key;
+      returnArr.push(item);
     });
     return returnArr;
-	}
+  }
 
-	toPgination = (items) => {
-		var index = items.length - 1;
+  toPgination = (items) => {
+    //save the last key
+    var index = items.length - 1;
     if (items.length < this.state.limit) {
       this.setState({ loadMore: false });
       return items;
     }
-
-    //save the last key
-  	this.setState({
-  		startAt: items[index].key
-  	});
-
-  	//and remove it
-  	items.splice(index, 1);
-  	return items;
-	}
-
-  componentDidMount = () => {
-  	const itemsRef = firebase.database().ref('items')
-  		.orderByValue()
-  		.limitToFirst(this.state.limit)
-  		.startAt(this.state.startAt);
-
-  	itemsRef.once('value', (snapshot) => {
-			// last key to pagination
-  		var items = this.snapshotToArray(snapshot)
-  		var itemsPrintList = this.toPgination(items)
-
-  		itemsPrintList.forEach(item => {
-  			this.setState({
-  				items: this.state.items.concat(item)
-  			})
-  		})
-  	})
+    
+    this.setState({
+      startAt: items[index][this.state.child]
+    });
+    //and remove it
+    items.splice(index, 1);
+    return items;
   }
 
-	loadItems = () => {
-  	const itemsRef = firebase.database().ref('items')
-  		.orderByKey()
-  		.limitToFirst(this.state.limit)
-  		.startAt(this.state.startAt);
+  componentDidMount = () => {
+    firebase.database().ref('items')
+      .orderByChild('name')
+      .limitToFirst(this.state.limit)
+      .once('value').then(this.pagination)
+  }
 
-  	itemsRef.once('value', (snapshot) => {
-			// last key to pagination
-  		var items = this.snapshotToArray(snapshot)
+  pagination = (snapshot) => {
+    var items = this.snapshotToArray(snapshot)
+    if (items.length > 0) {
       var itemsPrintList = this.toPgination(items)
-      console.log(itemsPrintList)
+      itemsPrintList.forEach(item => {
+        this.setState({
+          items: this.state.items.concat(item)
+        })
+      })
+      return this.setState({loading: false})
+    }
+    return this.setState({firstLoading: 'No hay productos...'})
+  }
 
-  		itemsPrintList.forEach(item => {
-  			this.setState({
-  				items: this.state.items.concat(item)
-  			})
-  		})
-  	})
-	}
+  loadItems = () => {
+    this.setState({loading: true})
+    firebase.database().ref('items')
+      .orderByChild('name')
+      .startAt(this.state.startAt)
+      .limitToFirst(this.state.limit)
+      .once('value').then(this.pagination)
+  }
 
   render() {
 
     return (
-    	<div>
-    		<br/>
-    		<h3>Productos</h3>
-    			{
-    				this.state.items.length ? (
-    					<div>
-    						<Row>
-    							{
-    								this.state.items.map((item, index) => (
-    									<Col key={index} md={3}>
-    										<ProductView  
-    										  name={item.name}
-    										  qty={item.qty}
-    										  price={item.price}
-    										  salePrice={item.salePrice}
-    										  img={item.img}
-    										  viewPrice={item.viewPrice}
-    										  desc={item.desc}
-    										  categories={item.categories}/>
-    									</Col>
-    							  )) 
-    							}
-								</Row>
-    						<Row>
-    							{
-    								this.state.loadMore ? (
-    									<Button size='sm' color='primary' onClick={this.loadItems}>Mas productos...</Button>
-    								) : (
-    									<small>Eso es todo...</small>
-    								)
-    							}
-    						</Row>
-    					</div>
-    				) : (
-    					<p>Cargando...</p>
-    				)
-    			}
-    	</div>
+    	<div>    
+        <br/>
+        <h3>Productos</h3>
+          {
+            this.state.items.length ? (
+              <div>
+                <Row>
+                  {
+                    this.state.items.map((item, index) => (
+                      <Col key={index} md={3}>
+                        <ProductView  
+                          name={item.name}
+                          desc={item.desc}
+                          img={item.img}
+                          qty={item.qty}
+                          price={item.price}
+                          salePrice={item.salePrice}
+                          viewPrice={item.viewPrice}
+                          offer={item.offer}
+                          categories={item.categories}/>
+                      </Col>
+                    )) 
+                  }
+                </Row>
+                <Row>
+                {
+                    this.state.loadMore ? (
+                      <div>
+                        {
+                          this.state.loading ? (
+                            <Button size='sm' color='primary' disabled>cargando...</Button>
+                          ) : (
+                            <Button size='sm' color='primary' onClick={this.loadItems}>Mas productos...</Button>
+                          )
+                        }
+                      </div>
+                    ) : null
+                  }
+                </Row>
+              </div>
+            ) : (
+              <p>{this.state.firstLoading}</p>
+            )
+          }
+      </div>
     );
-	}
+  }
 }

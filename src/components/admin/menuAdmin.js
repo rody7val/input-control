@@ -44,7 +44,7 @@ import {
 
     return (
       <div>
-        <Nav tabs>
+        <Nav className='shadow' style={{backgroundColor: '#fff'}} tabs>
           <NavItem>
             <Link className='nav-link' to={'/admin'}>Dashboard</Link>
           </NavItem>

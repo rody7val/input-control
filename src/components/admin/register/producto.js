@@ -8,17 +8,26 @@ import {
 	Button,
 	Form,
 	FormGroup,
-	FormText,
-  CustomInput,
 	Label,
 	Input,
-	InputGroup,
-	InputGroupAddon,
 	Card,
 	CardBody,
-	Badge,
 	Row,
-	Col } from 'reactstrap'
+	Col } from 'reactstrap';
+
+function prepareCategoriesForSave(arr){
+  var returnObj = {};
+  arr.forEach(item => {
+    returnObj[item.value] = true
+  });
+  return returnObj;
+}
+
+function prepareProviderForSave(obj){
+  var returnObj = {};
+  returnObj[obj.value] = true
+  return returnObj;
+}
 
 class Producto extends Component {
   constructor(props) {
@@ -32,11 +41,6 @@ class Producto extends Component {
       _providers: [],
       providers: [],
       uploadValue: 0,
-      // qty: undefined,
-      // price: undefined,
-      // salePrice: undefined,
-      // viewPrice: false,
-    	// gain: 0
     }
 
     this.crear = this.crear.bind(this)
@@ -51,55 +55,40 @@ class Producto extends Component {
   }
 
   getCategories = () => {
-    const _categoriesRef = firebase.database().ref().child('categories')
-
-    _categoriesRef.once('value').then(snapshot => {
-      snapshot.forEach(data => {
+    firebase.database()
+      .ref()
+      .child('categories')
+      .on('child_added', snapshot => {
         this.setState({
-          _categories: this.state._categories.concat(data.val())
+          _categories: this.state._categories.concat({label: snapshot.key, value: snapshot.key})
         })
       })
-    })
   }
 
   getProviders = () => {
-    const _providersRef = firebase.database().ref().child('providers')
-
-    _providersRef.once('value').then(snapshot => {
-      snapshot.forEach(data => {
+    firebase.database()
+      .ref()
+      .child('providers')
+      .on('child_added', snapshot => {
         this.setState({
-          _providers: this.state._providers.concat(data.val())
+          _providers: this.state._providers.concat({label: snapshot.key, value: snapshot.key})
         })
       })
-    })
   }
 
   setCategory = (category) => {
-    const dbRef = firebase.database().ref('categories')
-    const newCategory = dbRef.push()
-
-    newCategory.set(category).then(() => {
-      console.log('add', category)
-      this.setState({
-        _categories: this.state._categories.concat(category)
-      })
-    }).catch((err) => {
-      alert(err)
-    })
+    console.log(category)
+    firebase.database()
+      .ref('categories') 
+      .child(category.value)
+      .set(category)
   }
 
   setProvider = (provider) => {
-    const dbRef = firebase.database().ref('providers')
-    const newProvider = dbRef.push()
-
-    newProvider.set(provider).then(() => {
-      console.log('add', provider)
-      this.setState({
-        _providers: this.state._providers.concat(provider)
-      })
-    }).catch((err) => {
-      alert(err)
-    })
+    firebase.database()
+      .ref('providers')
+      .child(provider.value)
+      .set(provider)
   }
 
   crear(event) {
@@ -110,24 +99,21 @@ class Producto extends Component {
       name: this.state.name,
       desc: this.state.desc,
       img: this.state.img,
-      categories: this.state.categories,
-      providers: this.state.providers,
-      // qty: this.state.qty,
-      // price: this.state.price,
-      // salePrice: this.state.salePrice,
-      // viewPrice: this.state.viewPrice,
+      categories: prepareCategoriesForSave(this.state.categories),
+      providers: prepareProviderForSave(this.state.providers),
       created: moment().valueOf()
     }
 
-    const dbRef = firebase.database().ref('items')
-    const newItem = dbRef.push()
-
-  	newItem.set(item).then(() => {
-      alert('Nuevo producto creado!')
-    }).catch((err) => {
-      errors = true
-      alert(err)
-    })
+    firebase.database()
+      .ref('items')
+      .push()
+      .set(item)
+      .then(() => {
+        alert('Producto creado!')
+      }).catch((err) => {
+        errors = true
+        alert(err)
+      })
 
     if (!errors) {
   	  // reset state
@@ -138,11 +124,6 @@ class Producto extends Component {
         categories: [],
         providers: [],
       	uploadValue: 0,
-        // qty: undefined,
-        // price: undefined,
-        // salePrice: undefined,
-        // viewPrice: false,
-      	// gain: 0
       })
       event.target.reset()
     }
@@ -188,37 +169,30 @@ class Producto extends Component {
 
   changeCategories = (categories) => {
     let last = categories[categories.length-1] || {}
-
     if (last.__isNew__) {
       delete last.__isNew__
       this.setCategory(last)
     }
-
     this.setState({ categories })
-    console.log(categories)
+    console.log(this.state.categories)
   }
 
   changeProviders = (providers) => {
     let last = providers[providers.length-1] || {}
-
     if (last.__isNew__) {
       delete last.__isNew__
       this.setProvider(last)
     }
-
     this.setState({ providers })
-    console.log(providers)
+    console.log(this.state.providers)
   }
 
 	render() {
-    // const { categories } = this.state;
-
 		return (
 			<Row>
 				<Col md={8} sm={12}>
-					<br/>
 					<h3>Registrar Producto</h3>
-					<Card>
+					<Card className='shadow'>
 						<CardBody>
 							<Form onSubmit={this.crear}>
       				  <FormGroup>
@@ -234,9 +208,8 @@ class Producto extends Component {
                   <FileUpload onUpload={this.onUpload} uploadValue={this.state.uploadValue}/>
                 </FormGroup>
                 <FormGroup>
-                  <Label>Proveedores</Label>
+                  <Label>Proveedor</Label>
                   <Select
-                    isMulti
                     value={this.state.providers}
                     onChange={this.changeProviders}
                     options={this.state._providers}/>
@@ -255,7 +228,6 @@ class Producto extends Component {
 					</Card>
 				</Col>
 				<Col md={4} sm={12}>
-					<br/>
 					<h3>Vista previa</h3>
           <ProductView 
             name={this.state.name}

@@ -7,6 +7,7 @@ import './App.css';
 import Menu from './components/menu'
 import Admin from './components/admin/index'
 import ListItems from './components/listItems'
+import Footer from './components/footer'
 
 const Contacto = () => <p>Formulario de contacto.</p>;
 const Empresa = () => <p>Descripcion de la empresa.</p>;
@@ -21,16 +22,24 @@ class App extends Component {
   }
 
   componentDidMount = () => {
+    // this.setState({ 
+    //   user: {
+    //     active: true,
+    //     admin: true,
+    //     photoURL: '/img-card-example.png',
+    //     displayName: 'rody'
+    //   } 
+    // })
     firebase.auth().onAuthStateChanged(user => {
-
-      const propsAdminUserRef = firebase.database().ref(`users/${user.uid}`)
-      propsAdminUserRef.once('value').then(snapshot => {
-        user.admin = snapshot.val().admin
-        user.active = snapshot.val().active
-        user.created = snapshot.val().created
-        this.setState({ user })
+      firebase.database()
+        .ref(`users/${user.uid}`)
+        .once('value')
+        .then(snapshot => {
+          user.admin = snapshot.val().admin
+          user.active = snapshot.val().active
+          user.created = snapshot.val().created
+          this.setState({ user })
       })
-
     })
   }
 
@@ -62,26 +71,25 @@ class App extends Component {
         <Router>
           <div>
             <Menu signout={this.signout} auth={this.auth} user={this.state.user}/>
-
             
-              <Container>
-                <Route exact path="/" component={ListItems} />
-                <Route exact path="/company" component={Empresa} />
-                <Route exact path="/contact" component={Contacto} />
-                { 
-                  this.state.user ? 
-                  <Route path="/admin" render={({match}) => (
-                    <Admin match={match} user={this.state.user} />
-                  )}/> 
-                  : 
-                  <Route path="/admin" component={_403} />
-                }
-              </Container>
+            <Container style={{minHeight: '-webkit-fill-available'}}>
+              <Route exact path="/" component={ListItems} />
+              { 
+                this.state.user ? 
+                <Route path="/admin" render={({match}) => (
+                  <Admin match={match} user={this.state.user} />
+                )}/> 
+                : 
+                <Route path="/admin" component={_403} />
+              }
+            </Container>
             
+            <br/>
+            <br/>
+            <Footer/>
           </div>
         </Router>
 
-        <br/>
       </div>
     );
   }

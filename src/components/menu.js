@@ -42,47 +42,47 @@ class Menu extends Component {
 
 	render() {
 		return (
-      <Navbar color="dark" dark expand="sm">
+      <Navbar className='shadow' color="dark" dark expand="sm">
       	<Container>
           <Link className='navbar-brand' to={'/'}>INSUMAX</Link>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
-							<NavItem>
-								<Link className='nav-link marginLink' to={'/company'}>EMPRESA</Link>
-							</NavItem>
-            	<NavItem>
-              	<Link className='nav-link marginLink' to={'/contact'}>CONTACTO</Link>
-              </NavItem>
-            	{
-            		!this.props.user ? (
-              		<NavItem>
-              			<NavLink className='marginLink' style={{cursor: 'pointer'}} onClick={this.login}>ACCEDER</NavLink>
-              		</NavItem>
-            		) : (
-              		<UncontrolledDropdown nav inNavbar>
-                		<DropdownToggle nav caret>
-		                  <img src={this.props.user.photoURL} alt='user-img' className='imgUser' />
-                		</DropdownToggle>
-                		<DropdownMenu right className='backgroundDark'>
-		                  <DropdownItem className='backgroundDark'>
-                    		<Link className='nav-link' to={'/admin'}>Administración</Link>
-		                  </DropdownItem>
-		                  <DropdownItem divider />
-		                  <DropdownItem className='backgroundDark' style={{cursor: 'pointer'}} onClick={this.logout}>
-		                  	<NavLink>Salir</NavLink>
-		                  </DropdownItem>
-                		</DropdownMenu>
-              		</UncontrolledDropdown>
-            		)
-            	}
+              {
+                !this.props.user ? (
+                  <NavItem>
+                    <NavLink className='marginLink' style={{cursor: 'pointer'}} onClick={this.login}>ACCEDER</NavLink>
+                  </NavItem>
+                ) : (
+                  <UncontrolledDropdown nav inNavbar>
+                    <DropdownToggle nav caret>
+                      <img src={this.props.user.photoURL} alt='user-img' className='imgUser' />
+                    </DropdownToggle>
+                    <DropdownMenu right className='backgroundDark'>
+                      <DropdownItem className='backgroundDark'>
+                        <Link className='nav-link' to={'/admin'}>Administración</Link>
+                      </DropdownItem>
+                      <DropdownItem divider />
+                      <DropdownItem className='backgroundDark' style={{cursor: 'pointer'}} onClick={this.logout}>
+                        <NavLink>Salir</NavLink>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                )
+              }
             </Nav>
           </Collapse>
-      	</Container>
+        </Container>
       </Navbar>
 
-		);
-	}
+    );
+  }
 }
 
 export default Menu;
+							// <NavItem>
+							// 	<Link className='nav-link marginLink' to={'/company'}>EMPRESA</Link>
+							// </NavItem>
+       //      	<NavItem>
+       //        	<Link className='nav-link marginLink' to={'/contact'}>CONTACTO</Link>
+       //        </NavItem>

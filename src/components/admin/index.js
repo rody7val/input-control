@@ -2,18 +2,17 @@ import React, { Component } from 'react';
 import { Route } from 'react-router-dom'
 import MenuAdmin from './menuAdmin'
 import MenuUser from './menuUser'
+
 import Producto from './register/producto'
+
+import Stock from './report/stock'
 
 // admin
 const Dashboard = ({match}) => <p>Dasboard admin <code>{match.url}</code>.</p>;
 
-const Cliente = ({match}) => <p>Registro nuevo cliente <code>{match.url}</code>.</p>;
-const Proveedor = ({match}) => <p>Registro nuevo proveedor <code>{match.url}</code>.</p>;
-
 const Compra = ({match}) => <p>Operación nueva compra <code>{match.url}</code>.</p>;
 const Venta = ({match}) => <p>Operación nueva venta <code>{match.url}</code>.</p>;
 
-const Stock = ({match}) => <p>Informe de stock <code>{match.url}</code>.</p>;
 const Operaciones = ({match}) => <p>Informe de operaciones de compras y ventas<code>{match.url}</code>.</p>;
 const Usuarios = ({match}) => <p>Informe de usuarios <code>{match.url}</code>.</p>;
 
@@ -34,6 +33,7 @@ class Admin extends Component {
 								user.active ? (
 									<div>		
 										<MenuAdmin url={match.url}/>
+										<br/>
 										<Route exact path={match.url} component={Dashboard} />
 
 										<Route path={`${match.url}/register/product`} component={Producto} />
@@ -56,6 +56,7 @@ class Admin extends Component {
 								user.active ? (
 									<div>
 										<MenuUser url={match.url}/>
+										<br/>
 										<Route exact path={match.url} component={DashboardUser} />
 										<Route path={`${match.url}/orders`} component={Pedidos} />
 									</div>

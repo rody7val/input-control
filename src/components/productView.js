@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	Badge,
 	Card,
 	CardImg,
 	CardBody,
@@ -7,36 +8,61 @@ import {
 	CardSubtitle,
 	CardText,
 	Button,
-	Badge } from 'reactstrap';
+	Modal,
+	ModalHeader,
+	ModalBody,
+	ModalFooter } from 'reactstrap';
 
 export default class ProductView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modal: false
+    };
+
+    this.toggle = this.toggle.bind(this);
+  }
+
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
 
   render() {
-  	const { 
-  		name,
-			qty,
-			price,
-			salePrice,
-			img,
-			viewPrice,
-			desc,
-			categories } = this.props
+  	const { name, img, desc, offer } = this.props
 
     return (
     	<div>
-				<Card>
+    		<Card className='shadowHover' onClick={this.toggle}>
 					<CardImg className='cover' top width="100%" src={img} alt="item-img" />
 					<CardBody>
-					  <CardTitle>{name}</CardTitle>
-					  {
-					    viewPrice ? (
-					      <CardSubtitle>$ {salePrice}</CardSubtitle>
-					    ) : null
-					  }
-					  <CardText className='ellipsis'>{desc}</CardText>
-					  <Button size='sm' color='info'>Añadir al pedido</Button>
+						<CardTitle>{name}</CardTitle>
+						{
+							offer ? <CardSubtitle><Badge pill color='warning'>OFF</Badge></CardSubtitle> : null
+						}
+						<CardText className='ellipsis'>{desc}</CardText>
+						
 					</CardBody>
 				</Card>
+				
+				<Modal isOpen={this.state.modal} toggle={this.toggle}>
+          <ModalHeader toggle={this.toggle}>
+          	<CardImg className='cover' top width="100%" src={img} alt="item-img" />
+          </ModalHeader>
+          <ModalBody>
+          	<CardTitle>{name}</CardTitle>
+						{
+							offer ? <CardSubtitle><Badge pill color='warning'>OFF</Badge></CardSubtitle> : null
+						}
+						<CardText className='ellipsis'>{desc}</CardText>
+
+          </ModalBody>
+          <ModalFooter>
+          	<Button size='sm' color='info'>Añadir al pedido</Button>
+            <Button size='sm' color="secondary" onClick={this.toggle}>Cerrar</Button>
+          </ModalFooter>
+        </Modal>
 				<br/>
 			</div>
     );

@@ -4,10 +4,35 @@ const moment = require('moment');
 
 admin.initializeApp(functions.config().firebase);
 
-exports.welcome = functions.auth.user().onCreate(event => {
+exports.welcome = functions.auth.user().onCreate( event => {
 	const user = event.data
 	user.active = true
 	user.admin = false
 	user.created = moment().valueOf()
 	admin.database().ref('users/' + user.uid).set(user)
 })
+
+exports.pushItem = functions.database.ref('/items/{pushId}').onCreate( event => {
+	const key = event.params.pushId
+	const snapshot = event.data
+	const item = snapshot.val()
+
+	Object.keys(item.categories).forEach( category => {
+		admin.database()
+			.ref(`/categories/${category}`)
+			.child('members')
+			.set({[snapshot.key]: true})
+			.then(() => {
+				console.log('Categories references', snapshot.key);
+			})
+	})
+	Object.keys(item.providers).forEach( provider => {
+		admin.database()
+			.ref(`/providers/${provider}`)
+			.child('members')
+			.set({[snapshot.key]: true})
+			.then(() => {
+				console.log('Providers references', snapshot.key);
+			})
+	})
+});
