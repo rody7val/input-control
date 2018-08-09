@@ -226,7 +226,8 @@ class Producto extends Component {
 							</Form>
 						</CardBody>
 					</Card>
-				</Col>
+          <br/>
+        </Col>
 				<Col md={4} sm={12}>
 					<h3>Vista previa</h3>
           <ProductView 
@@ -235,8 +236,7 @@ class Producto extends Component {
             img={this.state.img}
             qty={this.state.qty}
             categories={this.state.categories}/>
-				</Col>
-				<br/>
+        </Col>
 			</Row>
 		)
 	}

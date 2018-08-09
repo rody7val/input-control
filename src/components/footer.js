@@ -11,16 +11,16 @@ class Footer extends Component {
 				<Container>
 					<Row>
 						<Col md={4} sm={12}>
-							<h5 className='footerTitle'>Empresa</h5>
-							<p>loren ipsum dolor cura cuorum jaquet di poter</p>
+							<h6 className='footerTitle'>EMPRESA</h6>
+							<p><small>loren ipsum dolor cura cuorum jaquet di poter</small></p>
 						</Col>
 						<Col md={4} sm={12}>
-							<h5 className='footerTitle'>Social</h5>
-							<p>loren cuorum jaquet di poteripsum dolor cura cuorum jaquet di poter</p>
+							<h6 className='footerTitle'>SOCIAL</h6>
+							<p><small>loren cuorum jaquet di poteripsum dolor cura cuorum jaquet di poter</small></p>
 						</Col>
 						<Col md={4} sm={12}>
-							<h5 className='footerTitle'>Contacto</h5>
-							<p>loren ipsum dolor cura cuorum</p>
+							<h6 className='footerTitle'>CONTACTO</h6>
+							<p><small>loren ipsum dolor cura cuorum</small></p>
 						</Col>
 					</Row>
 				</Container>

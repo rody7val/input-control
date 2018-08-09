@@ -1,3 +1,5 @@
+@import "../node_modules/font-awesome/css/font-awesome.css";
+
 body{
 	background-color: #ebebeb;
 }
@@ -46,10 +48,10 @@ a {
 	cursor: pointer;
 }
 footer{
-	color: rgba(255,255,255,.5);
+	color: rgba(255,255,255,.75);
 }
 .footerTitle{
-	color: rgba(255,255,255,.75);
+	color: rgba(255,255,255,.5);
 }
 @media screen and (max-width: 575px){
 	body{

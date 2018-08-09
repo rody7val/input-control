@@ -19,18 +19,16 @@ exports.pushItem = functions.database.ref('/items/{pushId}').onCreate( event => 
 
 	Object.keys(item.categories).forEach( category => {
 		admin.database()
-			.ref(`/categories/${category}`)
-			.child('members')
-			.set({[snapshot.key]: true})
+			.ref(`/categories/${category}/members/${snapshot.key}`)
+			.set(true)
 			.then(() => {
 				console.log('Categories references', snapshot.key);
 			})
 	})
 	Object.keys(item.providers).forEach( provider => {
 		admin.database()
-			.ref(`/providers/${provider}`)
-			.child('members')
-			.set({[snapshot.key]: true})
+			.ref(`/providers/${provider}/members/${snapshot.key}`)
+			.set(true)
 			.then(() => {
 				console.log('Providers references', snapshot.key);
 			})
