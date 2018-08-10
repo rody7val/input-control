@@ -7,10 +7,11 @@ import Producto from './register/producto'
 
 import Stock from './report/stock'
 
+import Compra from './operation/buy'
+
 // admin
 const Dashboard = ({match}) => <p>Dasboard admin <code>{match.url}</code>.</p>;
 
-const Compra = ({match}) => <p>Operación nueva compra <code>{match.url}</code>.</p>;
 const Venta = ({match}) => <p>Operación nueva venta <code>{match.url}</code>.</p>;
 
 const Operaciones = ({match}) => <p>Informe de operaciones de compras y ventas<code>{match.url}</code>.</p>;

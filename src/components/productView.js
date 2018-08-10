@@ -65,7 +65,7 @@ export default class ProductView extends React.Component {
 				
 				<Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>
-          	<CardImg className='cover' top width="100%" src={img} alt="item-img" />
+          	<CardImg top width="100%" src={img} alt="item-img" />
           </ModalHeader>
           <ModalBody>
           	<CardTitle>{name}</CardTitle>

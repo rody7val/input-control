@@ -1,5 +1,27 @@
 @import "../node_modules/font-awesome/css/font-awesome.css";
-
+.modal-title{ 
+	width: 100%
+}
+.list-group-item.active{
+	background-color: #17a2b8;
+	border-color: #1798b8;
+}
+label.custom-control-label{
+	width: 100%;
+	padding: .75rem 1.25rem .75rem 0rem;
+	margin-left: 2.25rem;
+}
+label.custom-control-label::before{
+	margin-top: .75rem;
+}
+.custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+        background-color: #007bff;
+}
+label.custom-control-label::after{
+	top: 1rem;
+	left: -1.5rem;
+}
+.list-group-item{padding: 0px}
 body{
 	background-color: #ebebeb;
 }
@@ -47,11 +69,30 @@ a {
     box-shadow: 1px 2px 17px 0 rgba(0,0,0,.2);
 	cursor: pointer;
 }
-footer{
+.footerTop{
+	background-color: #343a40;
 	color: rgba(255,255,255,.75);
 }
+.footerBottom{
+	background-color: #212529;
+	color: #868e96;
+}
+.footerBottom a {
+	color: #868e96;
+}
+.footerBottom a:hover {
+	color: #007bff;
+}
 .footerTitle{
+	letter-spacing: .15em;
 	color: rgba(255,255,255,.5);
+}
+.hoverRed:hover{
+	color: #ff8787;
+}
+.ease{
+    -webkit-transition: all .2s ease-in;
+    transition: all .2s ease-in;
 }
 @media screen and (max-width: 575px){
 	body{
