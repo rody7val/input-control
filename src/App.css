@@ -1,5 +1,5 @@
 @import "../node_modules/font-awesome/css/font-awesome.css";
-.modal-title{ 
+.modal-title{
 	width: 100%
 }
 .list-group-item.active{
@@ -79,6 +79,10 @@ a {
 }
 .footerBottom a {
 	color: #868e96;
+}
+.footerBottom p {
+	margin-top: 1rem;
+    margin-bottom: 0;
 }
 .footerBottom a:hover {
 	color: #007bff;

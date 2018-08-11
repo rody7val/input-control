@@ -41,6 +41,7 @@ class Buy extends Component {
     super(props)
     this.state = {
       dropdownOpen: false,
+    	valueSearch: '',
       _items: [],
       itemsSearch: [],
       itemsList: [],
@@ -50,6 +51,7 @@ class Buy extends Component {
     this.toggle = this.toggle.bind(this)
     this.filterSearch = this.filterSearch.bind(this)
 		this.searchToList = this.searchToList.bind(this)
+		this.listToSearch = this.listToSearch.bind(this)
     this.crear = this.crear.bind(this)
     this.change = this.change.bind(this)
     this.changeInputsSearchList = this.changeInputsSearchList.bind(this)
@@ -61,18 +63,24 @@ class Buy extends Component {
     });
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
   	firebase.database()
   		.ref('items')
-  		.on('child_added', snapshot => {
-  			this.setState({
-  				_items: this.state._items.concat(addProperties( snapshot )),
-  				itemsSearch: this.state.itemsSearch.concat(addProperties( snapshot ))
+  		.orderByChild('name')
+  		.once('value')
+  		.then(snapshot => {
+  			snapshot.forEach(item => {
+  				this.setState({
+  					_items: this.state._items.concat(addProperties( item )),
+  					itemsSearch: this.state.itemsSearch.concat(addProperties( item ))
+  				})
   			})
   		})
   }
-
 	filterSearch = (event) => {
+		this.setState({
+			valueSearch: event.target.value
+		})
 		if (event.target.value === '') {
 			return this.setState({
 				itemsSearch: this.state._items
@@ -82,11 +90,8 @@ class Buy extends Component {
 		this.setState({ itemsSearch: this.state._items.filter(item => {
 				var name = removeAccents(item.name);
 				var value_1 = name.toLowerCase().search( event.target.value.toLowerCase() ) !== -1;
-			 	var value_2 = item.done == true;
-			 	var value_3 = item.listSelected == false;
-			 	return value_1 
-			 	// && value_2 
-			 	&& value_3;
+			 	var value_2 = item.listSelected == false;
+			 	return value_1 && value_2;
 			})
 		})
   }
@@ -106,47 +111,82 @@ class Buy extends Component {
   }
 
 	searchToList = () => {
-		// add to list
-		let arr = this.state.itemsList;
-		this.state.itemsSearch.forEach(item => {
+		// add items to list
+		let itemsList = this.state.itemsList;
+		this.state._items.forEach(item => {
 			if (item.done && !item.listSelected) {
-				arr.push(item)
+				// item.done = !item.done;
+				itemsList.push(item)
 			}
 		})
 		this.setState({
-			itemsList: arr
+			itemsList: itemsList
 		})
-		// delete from search
-		this.setState({
-			itemsSearch: this.state.itemsSearch.filter(item => {
-				return item.done == false
-			})
-		})
-		// add property selected in _items[]
-		let arr_1 = this.state._items;
+		// refresh _items and itemsSearch
+		let _items = [];
 		this.state._items.forEach(item => {
 			if (item.done) {
 				item.listSelected = true
-				arr_1.push(item)
 			}
+			_items.push(item)
+		})
+		var filter = _items.filter(item => {
+			var name = removeAccents(item.name);
+			var value_1 = name.toLowerCase().search( this.state.valueSearch.toLowerCase() ) !== -1;
+		 	var value_2 = item.listSelected == false;
+		 	return value_1 && value_2;
 		})
 		this.setState({
-			_items: arr_1
+			_items: _items,
+			itemsSearch: filter
+		})
+	}
+
+	listToSearch = () => {
+		let itemsList = this.state.itemsList;
+		let _items = this.state._items;
+		// delete items from search
+		this.setState({
+			itemsList: this.state.itemsList.filter(item => {
+				return item.done == false
+			})
+		})
+		// delete items from list
+		_items.forEach((item, index) => {
+			itemsList.forEach(itemList => {
+				if (itemList.key === item.key && itemList.done ) {
+					console.log('key', item.name)
+					_items[index].listSelected = false
+					_items[index].done = false
+				}
+			})
+		})
+		this.setState({
+			_items: _items,
+			itemsSearch: _items,
+			valueSearch: ''
 		})
 	}
 
 	changeInputsSearchList = (event) => {
+		// change item.done in _items[] and itemsSearch[]
     var arr = [];
-		this.state.itemsSearch.forEach((item, index) => {
-			if (item.key == event.target.id) {
+		this.state._items.forEach((item, index) => {
+			if (event.target.id === item.key) {
 				item.done = !item.done
 			}
 			arr.push(item)
 		})
+		var filter = arr.filter(item => {
+			var name = removeAccents(item.name);
+			var value_1 = name.toLowerCase().search( this.state.valueSearch.toLowerCase() ) !== -1;
+		 	var value_2 = item.listSelected == false;
+		 	return value_1 && value_2;
+		})
 
 		this.setState({
 			_items: arr,
-			itemsSearch: arr
+			itemsSearch: filter
 		})
 	}
 
@@ -181,6 +221,7 @@ class Buy extends Component {
 											<CardHeader tag="h5">
 												Buscador
 												<Buscador
+													value={this.state.valueSearch}
 													items={this.state.itemsSearch}
 													change={this.changeInputsSearchList}
 
@@ -200,7 +241,7 @@ class Buy extends Component {
       									    Acciones
       									  </DropdownToggle>
       									  <DropdownMenu>
-      									    <DropdownItem>Quitar item(s)</DropdownItem>
+      									    <DropdownItem onClick={this.listToSearch}>Quitar item(s)</DropdownItem>
       									  </DropdownMenu>
       									</ButtonDropdown>
 											</CardHeader>
@@ -209,7 +250,7 @@ class Buy extends Component {
             						 items={this.state.itemsList}
             						 change={this.changeInputsList}
             						 filter={false}
-            						 noItemLabel={'Ningun item seleccionado'}/>
+            						 noItemLabel={'Ningun producto seleccionado'}/>
 											</CardBody>
 										</Card>
       					    <br/>

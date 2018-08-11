@@ -19,14 +19,14 @@ class Buscador extends React.Component {
   }
 
   render() {
-    const { items, buttonLabel, filter, change, searchToList } = this.props;
+    const { items, buttonLabel, filter, change, searchToList, value } = this.props;
 
     return (
       <div style={{display: 'inline'}}>
         <Button onClick={this.toggle} size='sm' style={{float: 'right'}}>{buttonLabel}</Button>
         <Modal size='lg' isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
           <ModalHeader toggle={this.toggle}>
-            <Input focus='true' placeholder="Filtrar por nombre" bsSize="lg" onChange={filter}/>
+            <Input focus='true' placeholder="Filtrar por nombre" bsSize="lg" onChange={filter} value={value}/>
           </ModalHeader>
           <ModalBody>
             <List 

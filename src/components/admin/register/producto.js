@@ -58,9 +58,12 @@ class Producto extends Component {
     firebase.database()
       .ref()
       .child('categories')
-      .on('child_added', snapshot => {
-        this.setState({
-          _categories: this.state._categories.concat({label: snapshot.key, value: snapshot.key})
+      .once('value')
+      .then(snapshot => {
+        snapshot.forEach(category => {
+          this.setState({
+            _categories: this.state._categories.concat({label: category.key, value: category.key})
+          })
         })
       })
   }
@@ -69,9 +72,12 @@ class Producto extends Component {
     firebase.database()
       .ref()
       .child('providers')
-      .on('child_added', snapshot => {
-        this.setState({
-          _providers: this.state._providers.concat({label: snapshot.key, value: snapshot.key})
+      .once('value')
+      .then(snapshot => {
+        snapshot.forEach(provider => {
+          this.setState({
+            _providers: this.state._providers.concat({label: provider.key, value: provider.key})
+          })
         })
       })
   }
@@ -201,7 +207,7 @@ class Producto extends Component {
                 </FormGroup>
                 <FormGroup>
                   <Label for="desc">Descripción</Label>
-                  <Input required onChange={this.change} value={this.state.desc} type='text' name="desc" id="desc"/>
+                  <Input required onChange={this.change} value={this.state.desc} type='text' name="desc" id="desc" placeholder="Descripción del producto" />
                 </FormGroup>
                 <FormGroup>
                   <Label for="img">Imagen</Label>

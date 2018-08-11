@@ -8,7 +8,7 @@ export default class List extends React.Component {
       <ListGroup>
       {
         items.length ? items.map((item, index) => (
-        	<div>
+        	<small key={index}>
         	{
         		filter==true ? (
         			<div>
@@ -26,17 +26,17 @@ export default class List extends React.Component {
         				}
         			</div>
         		) : (
-        			<CustomInput
-            		id={item.key}
-            		name='done'
-            		type="checkbox"
-            		label={item.name}
-            		checked={item.done}
-            		onChange={change}
-            		className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
- 						)
+        			 <CustomInput
+            		  id={item.key}
+            		  name='done'
+            		  type="checkbox"
+            		  label={item.name}
+            		  checked={item.done}
+            		  onChange={change}
+            		  className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+ 					  )
         	}
-        	</div>
+        	</small>
         )) : <small>{noItemLabel}</small>
       }
       </ListGroup>

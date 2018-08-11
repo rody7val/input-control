@@ -22,14 +22,6 @@ class App extends Component {
   }
 
   componentDidMount = () => {
-    // this.setState({ 
-    //   user: {
-    //     active: true,
-    //     admin: true,
-    //     photoURL: '/img-card-example.png',
-    //     displayName: 'rody'
-    //   } 
-    // })
     firebase.auth().onAuthStateChanged(user => {
       firebase.database()
         .ref(`users/${user.uid}`)
@@ -57,7 +49,7 @@ class App extends Component {
   signout = (cb) => {
     firebase.auth().signOut()
       .then(result => {
-        this.setState({user: {}})
+        this.setState({user: null})
         console.log(`sesión cerrada.`)
         cb()
       })
