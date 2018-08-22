@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { HashRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { Container } from 'reactstrap';
 import firebase from 'firebase';
 import './App.css';
@@ -9,8 +9,6 @@ import Admin from './components/admin/index'
 import ListItems from './components/listItems'
 import Footer from './components/footer'
 
-const Contacto = () => <p>Formulario de contacto.</p>;
-const Empresa = () => <p>Descripcion de la empresa.</p>;
 const _403 = () => <p><code>403</code> Sección privada, accede al sistema.</p>;
 
 class App extends Component {
@@ -21,17 +19,25 @@ class App extends Component {
     }
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     firebase.auth().onAuthStateChanged(user => {
-      firebase.database()
-        .ref(`users/${user.uid}`)
-        .once('value')
-        .then(snapshot => {
-          user.admin = snapshot.val().admin
-          user.active = snapshot.val().active
-          user.created = snapshot.val().created
-          this.setState({ user })
-      })
+      var _user = user || {};
+      var myVar;
+      myVar = setTimeout(() => {
+        firebase.database()
+          .ref(`users/list/${user.uid}`)
+          .on('value', snapshot => {
+            if (snapshot.val() && snapshot.val().active) {
+              this.setState({load: false})
+              console.log('clear!')  
+              clearTimeout(myVar);
+            }
+            _user.admin = snapshot.val().admin
+            _user.active = snapshot.val().active
+            _user.created = snapshot.val().created
+            this.setState({ user: _user })
+        })
+      }, 3000);
     })
   }
 

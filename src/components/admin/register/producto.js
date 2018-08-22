@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import firebase from 'firebase'
 import moment from 'moment'
-import FileUpload from '../fileUpload'
+import FileUpload from '../utils/fileUpload'
 import Select from 'react-select/lib/Creatable';
 import ProductView from '../../productView'
 import { 
@@ -39,7 +39,7 @@ class Producto extends Component {
       _categories: [],
       categories: [],
       _providers: [],
-      providers: [],
+      provider: [],
       uploadValue: 0,
     }
 
@@ -57,7 +57,7 @@ class Producto extends Component {
   getCategories = () => {
     firebase.database()
       .ref()
-      .child('categories')
+      .child('categories/list')
       .once('value')
       .then(snapshot => {
         snapshot.forEach(category => {
@@ -71,7 +71,7 @@ class Producto extends Component {
   getProviders = () => {
     firebase.database()
       .ref()
-      .child('providers')
+      .child('providers/list')
       .once('value')
       .then(snapshot => {
         snapshot.forEach(provider => {
@@ -85,16 +85,24 @@ class Producto extends Component {
   setCategory = (category) => {
     console.log(category)
     firebase.database()
-      .ref('categories') 
+      .ref('categories/list') 
       .child(category.value)
-      .set(category)
+      .set(category).then(() => {
+        this.setState({
+          _categories: this.state._categories.concat(category)
+        })
+      })
   }
 
   setProvider = (provider) => {
     firebase.database()
-      .ref('providers')
+      .ref('providers/list')
       .child(provider.value)
-      .set(provider)
+      .set(provider).then(() => {
+        this.setState({
+          _providers: this.state._providers.concat(provider)
+        })
+      })
   }
 
   crear(event) {
@@ -106,12 +114,12 @@ class Producto extends Component {
       desc: this.state.desc,
       img: this.state.img,
       categories: prepareCategoriesForSave(this.state.categories),
-      providers: prepareProviderForSave(this.state.providers),
+      provider: prepareProviderForSave(this.state.provider),
       created: moment().valueOf()
     }
 
     firebase.database()
-      .ref('items')
+      .ref('items/list')
       .push()
       .set(item)
       .then(() => {
@@ -157,7 +165,7 @@ class Producto extends Component {
 
 	onUpload (event) {
     const file = event.target.files[0]
-    const storageRef = firebase.storage().ref(`/fotos/${file.name}`)
+    const storageRef = firebase.storage().ref(`/fotos/${moment().valueOf()}_${file.name}`)
     const task = storageRef.put(file)
 
     task.on('state_changed', snapshot => {
@@ -183,14 +191,14 @@ class Producto extends Component {
     console.log(this.state.categories)
   }
 
-  changeProviders = (providers) => {
-    let last = providers[providers.length-1] || {}
-    if (last.__isNew__) {
-      delete last.__isNew__
-      this.setProvider(last)
+  changeProvider = (provider) => {
+    console.log(provider)
+    if (provider.__isNew__) {
+      delete provider.__isNew__
+      this.setProvider(provider)
     }
-    this.setState({ providers })
-    console.log(this.state.providers)
+    this.setState({ provider })
+    console.log(this.state.provider)
   }
 
 	render() {
@@ -217,7 +225,7 @@ class Producto extends Component {
                   <Label>Proveedor</Label>
                   <Select
                     value={this.state.providers}
-                    onChange={this.changeProviders}
+                    onChange={this.changeProvider}
                     options={this.state._providers}/>
                 </FormGroup>
                 <FormGroup>

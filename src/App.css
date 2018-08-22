@@ -1,4 +1,20 @@
 @import "../node_modules/font-awesome/css/font-awesome.css";
+.nav-tabs a {
+	color: #fff
+}
+.nav-tabs .dropdown-toggle{
+	border-bottom-color: #007bff!important;
+}
+.nav-tabs .dropdown-item:hover {
+	background-color: #007bff!important;
+}
+.nav-tabs .dropdown-item a:hover {
+	color: #495057;	
+}
+.nav-tabs .dropdown-toggle .nav-link, .nav-tabs .dropdown-toggle, .nav-tabs .dropdown-menu, .nav-tabs .dropdown-menu.show{
+	background-color: #007bff!important;
+	border-bottom-color: #fff
+}
 .modal-title{
 	width: 100%
 }

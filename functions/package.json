@@ -4,7 +4,8 @@
   "dependencies": {
     "firebase-admin": "~4.2.1",
     "firebase-functions": "^0.5.7",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "nodemailer": "^4.6.8"
   },
   "private": true
 }

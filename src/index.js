@@ -7,12 +7,12 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 firebase.initializeApp({
-	apiKey: "<REPLACE ME>",
-	authDomain: "<REPLACE ME>",
-	databaseURL: "<REPLACE ME>",
-	projectId: "<REPLACE ME>",
-	storageBucket: "<REPLACE ME>",
-	messagingSenderId: "<REPLACE ME>"
+	apiKey: "AIzaSyCBfWA1dNZ2skNNierb5f-8wQNmR-KLqz0",
+	authDomain: "insu-max.firebaseapp.com",
+	databaseURL: "https://insu-max.firebaseio.com",
+	projectId: "insu-max",
+	storageBucket: "insu-max.appspot.com",
+	messagingSenderId: "90562965570",
 });
 
 ReactDOM.render(<App />, document.getElementById('root'));

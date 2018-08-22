@@ -1,8 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import ProductView from './productView'
-import { Button, Row, Col, ButtonGroup } from 'reactstrap';
-import Select from 'react-select/lib/Creatable';
+import { Button, Row, Col } from 'reactstrap';
 
 export default class ListItems extends React.Component {
   constructor(props) {
@@ -20,8 +19,9 @@ export default class ListItems extends React.Component {
 
   snapshotToArray = (snapshot) => {
     var returnArr = [];
-    snapshot.forEach(function(childSnapshot) {
+    snapshot.forEach(childSnapshot => {
       var item = childSnapshot.val();
+      console.log(childSnapshot.key)
       item.key = childSnapshot.key;
       returnArr.push(item);
     });
@@ -45,7 +45,7 @@ export default class ListItems extends React.Component {
   }
 
   componentDidMount = () => {
-    firebase.database().ref('items')
+    firebase.database().ref('items/list')
       .orderByChild('name')
       .limitToFirst(this.state.limit)
       .once('value').then(this.pagination)

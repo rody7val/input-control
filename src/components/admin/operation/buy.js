@@ -3,7 +3,6 @@ import firebase from 'firebase'
 import Buscador from './buscador'
 import List from '../utils/list'
 import {
-	Button,
 	Row,
 	Col,
 	Card,
@@ -13,11 +12,7 @@ import {
 	ButtonDropdown,
 	DropdownToggle,
 	DropdownMenu,
-	DropdownItem,
-	Modal,
-	ModalHeader,
-	ModalBody,
-	ModalFooter } from 'reactstrap';
+	DropdownItem } from 'reactstrap';
 
 function removeAccents(value) {
 	return value
@@ -65,7 +60,7 @@ class Buy extends Component {
 
   componentWillMount = () => {
   	firebase.database()
-  		.ref('items')
+  		.ref('items/list')
   		.orderByChild('name')
   		.once('value')
   		.then(snapshot => {

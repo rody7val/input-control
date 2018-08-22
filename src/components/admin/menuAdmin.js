@@ -44,7 +44,7 @@ import {
 
     return (
       <div>
-        <Nav className='shadow' style={{backgroundColor: '#fff'}} tabs>
+        <Nav className='shadow' style={{backgroundColor: '#007bff', borderColor: '#007bff'}} tabs>
           <NavItem>
             <Link className='nav-link' to={'/admin'}>Dashboard</Link>
           </NavItem>
@@ -82,9 +82,15 @@ import {
               <DropdownItem>
               	<Link to={`${url}/report/stock`}>Stock</Link>
               </DropdownItem>
+              <DropdownItem>
+                <Link to={`${url}/report/orders`}>Pedidos</Link>
+              </DropdownItem>
             	<DropdownItem>
-            		<Link to={`${url}/report/motions`}>Movimientos</Link>
+            		<Link to={`${url}/report/motions/buy`}>Compras</Link>
             	</DropdownItem>
+              <DropdownItem>
+                <Link to={`${url}/report/motions/sale`}>Ventas</Link>
+              </DropdownItem>
             	<DropdownItem>
             		<Link to={`${url}/report/users`}>Usuarios</Link>
             	</DropdownItem>

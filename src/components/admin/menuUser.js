@@ -10,7 +10,7 @@ import { Nav, NavItem } from 'reactstrap';
 
     return (
       <div>
-        <Nav tabs>
+        <Nav className='shadow' style={{backgroundColor: '#17a2b8', borderolor: '#17a2b8'}} tabs>
           <NavItem>
             <Link className='nav-link' to={`${url}`}>Dashboard</Link>
           </NavItem>

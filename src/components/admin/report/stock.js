@@ -14,7 +14,7 @@ export default class Stock extends React.Component {
 
   componentDidMount = () => {
     firebase.database()
-      .ref('items')
+      .ref('items/list')
       .orderByChild('created')
       .on('child_added', snapshot => {
           this.setState({

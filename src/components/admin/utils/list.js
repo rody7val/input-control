@@ -10,7 +10,7 @@ export default class List extends React.Component {
         items.length ? items.map((item, index) => (
         	<small key={index}>
         	{
-        		filter==true ? (
+        		filter===true ? (
         			<div>
         				{
         					!item.listSelected ? (
