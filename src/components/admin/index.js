@@ -9,11 +9,14 @@ import Producto from './register/producto'
 import Stock from './report/stock'
 
 import Compra from './operation/buy'
+import RegistroManual from './operation/regManual'
+
 import userList from './report/userList'
 import userView from './report/userView'
 
 // admin
 const Venta = ({match}) => <p>Operación nueva venta <code>{match.url}</code>.</p>;
+const Presupuesto = ({match}) => <p>Operación nueva presupuesto <code>{match.url}</code>.</p>;
 
 const Compras = ({match}) => <p>Informe compras <code>{match.url}</code>.</p>;
 const Ventas = ({match}) => <p>Informe ventas<code>{match.url}</code>.</p>;
@@ -32,6 +35,7 @@ class Admin extends Component {
 				{
 					user.admin ? (
 						<div>
+
 							{
 								user.active ? (
 									<div>		
@@ -43,6 +47,8 @@ class Admin extends Component {
 
 										<Route path={`${match.url}/operation/buy`} component={Compra} />
 										<Route path={`${match.url}/operation/sale`} component={Venta} />
+										<Route path={`${match.url}/operation/order`} component={Presupuesto} />
+										<Route path={`${match.url}/operation/manual-registration`} component={RegistroManual} />
 
 										<Route path={`${match.url}/report/stock`} component={Stock} />
 										<Route path={`${match.url}/report/orders`} component={Pedidos} />

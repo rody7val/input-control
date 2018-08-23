@@ -10,7 +10,7 @@ export default class User extends React.Component {
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     firebase.database()
       .ref(`users/list/${this.props.match.params.uid}`)
       .once('value')

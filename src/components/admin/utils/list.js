@@ -8,7 +8,7 @@ export default class List extends React.Component {
       <ListGroup>
       {
         items.length ? items.map((item, index) => (
-        	<small key={index}>
+        	<div key={index}>
         	{
         		filter===true ? (
         			<div>
@@ -36,7 +36,7 @@ export default class List extends React.Component {
             		  className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
  					  )
         	}
-        	</small>
+        	</div>
         )) : <small>{noItemLabel}</small>
       }
       </ListGroup>

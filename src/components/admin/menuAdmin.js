@@ -71,6 +71,12 @@ import {
               <DropdownItem>
               	<Link to={`${url}/operation/sale`}>Venta</Link>
               </DropdownItem>
+              <DropdownItem>
+                <Link to={`${url}/operation/order`}>Presupuesto</Link>
+              </DropdownItem>
+              <DropdownItem>
+                <Link to={`${url}/operation/manual-registration`}>Registro Manual</Link>
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
 

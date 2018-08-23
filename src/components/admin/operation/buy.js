@@ -31,7 +31,7 @@ function addProperties(snapshot) {
 	return item
 }
 
-class Buy extends Component {
+export default class Buy extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -72,6 +72,7 @@ class Buy extends Component {
   			})
   		})
   }
+
 	filterSearch = (event) => {
 		this.setState({
 			valueSearch: event.target.value
@@ -110,7 +111,7 @@ class Buy extends Component {
 		let itemsList = this.state.itemsList;
 		this.state._items.forEach(item => {
 			if (item.done && !item.listSelected) {
-				// item.done = !item.done;
+				// _item.done = !item.done;
 				itemsList.push(item)
 			}
 		})
@@ -271,5 +272,3 @@ class Buy extends Component {
 		)
 	}
 }
-
-export default Buy

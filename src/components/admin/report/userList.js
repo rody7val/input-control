@@ -26,8 +26,8 @@ export default class userList extends React.Component {
 
     return (
 			<div>
-        <h2>Usuarios registrados</h2>
-        <Card>
+        <h3>Usuarios registrados</h3>
+        <Card className='shadow'>
           <CardBody>
             <ListGroup>
             {
