@@ -43,7 +43,7 @@ class Menu extends Component {
 	render() {
 		return (
       <Navbar color="dark" dark expand="sm">
-      	<Container>
+      	<Container fluid>
           <Link className='navbar-brand' to={'/'}>INSUMAX</Link>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>

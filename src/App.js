@@ -71,21 +71,19 @@ export default class App extends Component {
           <div>
             <Menu signout={this.signout} auth={this.auth} user={this.state.user}/>
             
-            <Container style={{minHeight: '-webkit-fill-available'}}>
-              <Switch>
-                <Route exact path="/" component={ListItems} />
-                {
-                  this.state.user ? (
-                      <Route path="/admin" render={({match}) => (
-                        <Admin match={match} user={this.state.user} />
-                      )}/> 
-                  ) : (
-                    <Route path="/admin" component={_403} />
-                  )
-                }
-                <Route component={_404}/>
-              </Switch>
-            </Container>
+            <Switch>
+              <Route exact path="/" component={ListItems} />
+              {
+                this.state.user ? (
+                    <Route path="/admin" render={({match}) => (
+                      <Admin match={match} user={this.state.user} />
+                    )}/> 
+                ) : (
+                  <Route path="/admin" component={_403} />
+                )
+              }
+              <Route component={_404}/>
+            </Switch>
             
             <Modal isOpen={this.state.load} >
               <ModalBody>

@@ -79,14 +79,14 @@ export default class ListItems extends React.Component {
     return (
     	<Container style={{minHeight: '-webkit-fill-available'}}>  
         <br/>
-        <h3>Productos</h3>
+        <h3 className='title'>Productos</h3>
           {
             this.state.items.length ? (
               <div>
                 <Row>
                   {
                     this.state.items.map((item, index) => (
-                      <Col key={index} md={3}>
+                      <Col key={index} md={12} className='article'>
                         <ProductView  
                           name={item.name}
                           desc={item.desc}

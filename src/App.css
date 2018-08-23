@@ -2,6 +2,12 @@
 .nav-tabs a {
 	color: #fff
 }
+.title{
+	text-align: center;
+}
+.article{
+	max-width: 600px
+}
 .nav-tabs .dropdown-toggle{
 	border-bottom-color: #007bff!important;
 }
@@ -115,6 +121,9 @@ a {
     transition: all .2s ease-in;
 }
 @media screen and (max-width: 575px){
+	.title{
+		text-align: left;
+	}
 	body{
 		font-size: small
 	}
