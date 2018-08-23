@@ -243,10 +243,11 @@ export default class RegistroManual extends Component {
 											</CardHeader>
 											<CardBody>
             						<List 
-            						 items={this.state.itemsList}
-            						 change={this.changeInputsList}
-            						 filter={false}
-            						 noItemLabel={'Ningun producto seleccionado'}/>
+            							items={this.state.itemsList}
+            							change={this.changeInputsList}
+
+            							filter={false}
+            							noItemLabel={'Ningun producto seleccionado'}/>
 											</CardBody>
 										</Card>
       					    <br/>

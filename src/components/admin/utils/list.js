@@ -1,9 +1,32 @@
 import React from 'react';
-import { CustomInput, ListGroup } from 'reactstrap';
+import { Card, CardBody, Form, CustomInput, ListGroup, ListGroupItem, ListGroupItemHeading, Collapse, Button, FormGroup, Label, Input, InputGroup, InputGroupAddon, FormText, Badge } from 'reactstrap';
 
 export default class List extends React.Component {
+  constructor(props) {
+    super(props);
+    this.toggle = this.toggle.bind(this);
+    this.state = {
+      collapse: []
+    };
+  }
+
+  toggle(index) {
+    let arr = this.state.collapse;
+    arr[index] = !this.state.collapse[index]
+    this.setState({ collapse: arr });
+  }
+
+  componentDidMount(){
+    this.props.items.forEach((item, index) => {
+      this.setState({
+        collapse: this.state.collapse.concat({[index]: false })
+      })
+    });
+  }
+  
   render(){
-    const { items, change, noItemLabel, filter } = this.props
+    const { items, change, noItemLabel, filter } = this.props;
+
     return (
       <ListGroup>
       {
@@ -26,14 +49,45 @@ export default class List extends React.Component {
         				}
         			</div>
         		) : (
-        			 <CustomInput
-            		  id={item.key}
-            		  name='done'
-            		  type="checkbox"
-            		  label={item.name}
-            		  checked={item.done}
-            		  onChange={change}
-            		  className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+              <div>
+                
+                    <CustomInput
+                      id={item.key}
+                      name={item.key}
+                      type="checkbox"
+                      label={
+                        <div>
+                          {item.name}{' '}
+                          <Button size='sm' color="primary" onClick={() => this.toggle(index)} style={{float: 'right'}}>Edit</Button>
+                        </div>
+                      }
+                      checked={item.done}
+                      onChange={change}
+                      className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+                    
+                
+                <Collapse isOpen={this.state.collapse[index]}>
+                  <Card>
+                    <CardBody>
+                      <FormGroup>
+                        <Label for="qty">Stock</Label>
+                        <Input bsSize="sm" required onChange={this.change} value={this.state.qty} type="number" name="qty" id="qty" placeholder="Cantidad de unidades" />
+                        <Label for="price">Pcio. Compra</Label>
+                        <InputGroup size="sm">
+                          <InputGroupAddon bsSize="sm" addonType="prepend">$</InputGroupAddon>
+                          <Input bsSize="sm" required onChange={this.change} value={this.state.price} step='0.05' type="number" name="price" id="price" placeholder="Precio de compra" />
+                        </InputGroup>
+                        <Label for="salePrice">Pcio. Venta</Label>
+                        <InputGroup size="sm">
+                          <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                          <Input bsSize="sm" required onChange={this.change} value={this.state.salePrice} step='0.05' type="number" name="salePrice" id="salePrice" placeholder="Precio de venta" />
+                        </InputGroup>
+                        <FormText><Badge>{this.state.gain}%</Badge> de ganancia</FormText>
+                      </FormGroup>
+                    </CardBody>
+                  </Card>
+                </Collapse>
+              </div>
  					  )
         	}
         	</div>

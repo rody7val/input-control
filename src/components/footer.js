@@ -6,6 +6,8 @@ class Footer extends Component {
 	render() {
 		return (
 			<div>
+			<br/>
+			<br/>
 			<footer className='footerTop'>
 				<br/>
 				<br/>

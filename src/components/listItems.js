@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import ProductView from './productView'
-import { Button, Row, Col } from 'reactstrap';
+import { Container, Button, Row, Col } from 'reactstrap';
 
 export default class ListItems extends React.Component {
   constructor(props) {
@@ -77,7 +77,7 @@ export default class ListItems extends React.Component {
   render() {
 
     return (
-    	<div>    
+    	<Container style={{minHeight: '-webkit-fill-available'}}>  
         <br/>
         <h3>Productos</h3>
           {
@@ -121,7 +121,7 @@ export default class ListItems extends React.Component {
               <p>{this.state.firstLoading}</p>
             )
           }
-      </div>
+      </Container>
     );
   }
 }
