@@ -232,7 +232,7 @@ export default class RegistroManual extends Component {
 										<Card className='shadow'>
 											<CardHeader tag="h5">
 												Listado
-												<ButtonDropdown size='sm' style={{float: 'right'}} isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+												<ButtonDropdown style={{float: 'right'}} isOpen={this.state.dropdownOpen} toggle={this.toggle}>
       									  <DropdownToggle caret>
       									    Acciones
       									  </DropdownToggle>

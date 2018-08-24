@@ -118,7 +118,7 @@ export default class ListItems extends React.Component {
                 </Row>
               </div>
             ) : (
-              <p>{this.state.firstLoading}</p>
+              <p className='text-center'>{this.state.firstLoading}</p>
             )
           }
       </Container>

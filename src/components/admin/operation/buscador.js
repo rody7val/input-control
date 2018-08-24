@@ -23,7 +23,7 @@ class Buscador extends React.Component {
 
     return (
       <div style={{display: 'inline'}}>
-        <Button onClick={this.toggle} size='sm' style={{float: 'right'}}>{buttonLabel}</Button>
+        <Button onClick={this.toggle} style={{float: 'right'}}>{buttonLabel}</Button>
         <Modal size='lg' isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
           <ModalHeader toggle={this.toggle}>
             <Input focus='true' placeholder="Filtrar por nombre" bsSize="lg" onChange={filter} value={value}/>
