@@ -58,36 +58,19 @@ export default class List extends React.Component {
         			<div>
         				{
         					!item.listSelected ? (
-                    <div>
-                    {
-                      item.qty > 0 ? (
-                        <CustomInput
-                          disabled
-                          id={item.key}
-                          name='done'
-                          type="checkbox"
-                          label={
-                            <div>
-                              {item.name}{' '}
-                              <Badge size='sm' color='danger' pill>{item.qty}</Badge>
-                            </div>
-                          }
-                          className={`list-group-item-action list-group-item`} />
-                      ) : <CustomInput
-                        id={item.key}
-                        name='done'
-                        type="checkbox"
-                        label={
-                          <div>
-                            {item.name}{' '}
-                            <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
-                          </div>
-                        }
-                        checked={item.done}
-                        onChange={change}
-                        className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
-                    }
-                    </div>
+                    <CustomInput
+                      id={item.key}
+                      name='done'
+                      type="checkbox"
+                      label={
+                        <div>
+                          {item.name}{' '}
+                          <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
+                        </div>
+                      }
+                      checked={item.done}
+                      onChange={change}
+                      className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
         					) : null
         				}
         			</div>

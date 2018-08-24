@@ -9,17 +9,17 @@ import Producto from './register/producto'
 import Stock from './report/stock'
 
 import Compra from './operation/buy'
+import Venta from './operation/sale'
 import RegistroManual from './operation/regManual'
 
 import userList from './report/userList'
 import userView from './report/userView'
 
 // admin
-const Venta = ({match}) => <p>Operación nueva venta <code>{match.url}</code>.</p>;
+const Ventas = ({match}) => <p>Informe de ventas <code>{match.url}</code>.</p>;
 const Presupuesto = ({match}) => <p>Operación nueva presupuesto <code>{match.url}</code>.</p>;
 
-const Compras = ({match}) => <p>Informe compras <code>{match.url}</code>.</p>;
-const Ventas = ({match}) => <p>Informe ventas<code>{match.url}</code>.</p>;
+const Compras = ({match}) => <p>Informe de compras <code>{match.url}</code>.</p>;
 const Pedidos = ({match}) => <p>Gestion de pedidos <code>{match.url}</code>.</p>;
 
 // user

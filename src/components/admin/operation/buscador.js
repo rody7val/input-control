@@ -19,30 +19,17 @@ class Buscador extends React.Component {
   }
 
   render() {
-    const { items, buttonLabel, filter, change, searchToList, value } = this.props;
+    const { Search, FilteredItems, searchToList } = this.props;
 
     return (
-      <div style={{display: 'inline'}}>
-        <Button onClick={this.toggle} style={{float: 'right'}}>{buttonLabel}</Button>
-        <Modal size='lg' isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-          <ModalHeader toggle={this.toggle}>
-            <Input focus='true' placeholder="Filtrar por nombre" bsSize="lg" onChange={filter} value={value}/>
-          </ModalHeader>
-          <ModalBody>
-            <List 
-             items={items}
-             change={change}
-             filter={true}
-             noItemLabel={'No hay coincidencia'}/>
-          </ModalBody>
-          <ModalFooter>
-            <Button size='sm' color="secondary" onClick={this.toggle}>Ocultar</Button>
-            <Button size='sm' color="primary" onClick={searchToList}>Añadir a la lista</Button>{' '}
-          </ModalFooter>
-        </Modal>
-      </div>
+      <div></div>
     );
   }
 }
 
 export default Buscador;
+            // <List 
+            //  items={items}
+            //  change={change}
+            //  filter={true}
+            //  noItemLabel={'No hay coincidencia'}/>

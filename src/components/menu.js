@@ -44,7 +44,7 @@ class Menu extends Component {
 		return (
       <Navbar color="dark" dark fixed='top' expand="sm">
       	<Container>
-          <Link className='navbar-brand' to={'/'}>INSUMAX</Link>
+          <Link className='navbar-brand text-center' to={'/'}>INSUMAX</Link>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
