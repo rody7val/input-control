@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import update from 'react-addons-update';
 import SearchInput, {createFilter} from 'react-search-input'
 import firebase from 'firebase'
 // import Buscador from './buscador'
@@ -14,8 +15,8 @@ import {
 	DropdownMenu,
 	DropdownItem, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, ListGroup, CustomInput, Badge } from 'reactstrap';
 
-
 const KEYS_TO_FILTERS = ['name', 'desc']
+
 
 function addProperties(snapshot) {
 	let item = snapshot.val()
@@ -34,6 +35,7 @@ export default class Buy extends Component {
       searchTerm: '',
       items: []
     }
+    this.changeInputsSearch = this.changeInputsSearch.bind(this)
     this.searchUpdated = this.searchUpdated.bind(this)
     this.toggle = this.toggle.bind(this)
   }
@@ -62,11 +64,23 @@ export default class Buy extends Component {
   		})
   }
 
+  changeInputsSearch(event) {
+    let id = event.target.id;
+    let position = this.state.items.map(item => { return item.key; }).indexOf(id);
+    let value = !this.state.items[position].done;
+    
+    this.setState({
+      items: update(this.state.items, {
+        [position]: {done: {$set: value}}
+      })
+    });
+  }
+
 	render() {
 		let filteredItems = this.state.items.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
 		return (
 			<div>
-			<h3>Nueva Compra</h3>
+			<h3 className='title'>Nueva Compra</h3>
 			<Row>
 				<Col md={12}>
 					<Card className='shadow'>
@@ -80,10 +94,10 @@ export default class Buy extends Component {
 											<CardHeader tag="h5">
 												Buscadorrr
                         <div style={{display: 'inline'}}>
-                          <Button onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar producto</Button>
+                          <Button size='sm' onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar producto</Button>
                           <Modal size='lg' isOpen={this.state.modal} toggle={()=>this.toggle('modal')}>
                             <ModalHeader toggle={()=>this.toggle('modal')}>
-                              <SearchInput className="search-input" onChange={this.searchUpdated} />
+                              <SearchInput onChange={this.searchUpdated} />
                             </ModalHeader>
                             <ModalBody>
                               {filteredItems.map(item => {
@@ -102,7 +116,7 @@ export default class Buy extends Component {
                                         </div>
                                       }
                                       checked={item.done}
-                                      
+                                      onChange={this.changeInputsSearch}
                                       className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
                                   </div>
                                 )
