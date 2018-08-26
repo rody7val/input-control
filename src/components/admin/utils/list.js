@@ -85,7 +85,7 @@ export default class List extends React.Component {
                     <div>
                       {item.name}{' '}
                       <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
-                      <Button size='sm' color="primary" onClick={() => this.toggle(index)} style={{float: 'right'}}>Edit</Button>
+                      <Button size='sm' onClick={() => this.toggle(index)} style={{float: 'right'}}>Edit</Button>
                     </div>
                   }
                   checked={item.done}
@@ -109,7 +109,7 @@ export default class List extends React.Component {
                           <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                           <Input required onChange={this.change} value={this.state.salePrice} step='0.05' type="number" name="salePrice" id="salePrice" placeholder="Precio de venta" />
                         </InputGroup>
-                        <FormText><Badge>{this.state.gain}%</Badge> de ganancia</FormText>
+                        <FormText><Badge color={this.state.gain > 10 ? 'success' : 'danger' }>{this.state.gain}%</Badge> de ganancia</FormText>
                       </FormGroup>
                     </CardBody>
                   </Card>

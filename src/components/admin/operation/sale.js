@@ -39,7 +39,9 @@ export default class Buy extends Component {
     this.toggle = this.toggle.bind(this)
     this.searchUpdated = this.searchUpdated.bind(this)
     this.changeInputsSearch = this.changeInputsSearch.bind(this)
-    this.addToEdition = this.addToEdition.bind(this)
+    this.flush = this.flush.bind(this)
+    this.changeInputsEditor = this.changeInputsEditor.bind(this)
+    
   }
 
   toggle(type) {
@@ -63,14 +65,35 @@ export default class Buy extends Component {
       })
     });
   }
-
-  addToEdition(){
-    this.state.items.map( (item, index) => item.done ? this.setState({
-      itemsEdition: update(this.state.items, {
-        [index]: {$set: item}
+  
+  changeInputsEditor(event) {
+    let id = event.target.id;
+    let position = this.state.itemsEdition.map(item => {return item.key}).indexOf(id);
+    let value = this.state.itemsEdition[position] ? !this.state.itemsEdition[position].done : null;
+    
+    this.setState({
+      itemsEdition: update(this.state.itemsEdition, {
+        [position]: {done: {$set: value}}
       })
-    }): null
-    )
+    });
+  }
+
+  flush(from, to){
+    console.log(from, to)
+    // agregar items froms
+    this.state[from].forEach( (item, index) => {
+      this.setState({
+        [to]: update(this.state[to], {
+          $push: this.state[from].filter(item => { return item.done })
+        })
+      });
+    });
+    // Limpiar editor
+    this.setState({
+     [from]: this.state[from].filter(item => {
+        return item.done == false
+      })
+    });
   }
 
   componentWillMount() {
@@ -101,17 +124,28 @@ export default class Buy extends Component {
 								<Row>
 									<Col md={12}>
 										<Card className='shadow'>
-
 											<CardHeader tag="h5">
-												Buscador
-                        <div style={{display: 'inline'}}>
-                          <Button size='sm' onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar producto</Button>
-                          <Modal size='lg' isOpen={this.state.modal} toggle={()=>this.toggle('modal')}>
+												Edición
 
+                        <div style={{float: 'right'}}>
+                          <ButtonDropdown size='sm' style={{float: 'right'}} isOpen={this.state.dropdown} toggle={()=>this.toggle('dropdown')}>
+                            <DropdownToggle caret>
+                              Acciones
+                            </DropdownToggle>
+                            <DropdownMenu>
+                            {
+                              this.state.itemsEdition.length > 0
+                              ? <DropdownItem onClick={()=>this.flush('itemsEdition', 'items')}>Quitar item(s)</DropdownItem>
+                              : <DropdownItem disabled style={{cursor: 'not-allowed'}}>Quitar item(s)</DropdownItem>
+                            }
+                            </DropdownMenu>
+                          </ButtonDropdown>
+
+                          <Button color='info' size='sm' onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar producto</Button>
+                          <Modal size='lg' isOpen={this.state.modal} toggle={()=>this.toggle('modal')}>
                             <ModalHeader toggle={()=>this.toggle('modal')}>
                               <SearchInput onChange={this.searchUpdated} />
                             </ModalHeader>
-
                             <ModalBody>
                               {filteredItems.map(item => {
                                 return (
@@ -135,36 +169,18 @@ export default class Buy extends Component {
                                 )
                               })}
                             </ModalBody>
-
                             <ModalFooter>
-                              <Button size='sm' color="secondary" onClick={()=>this.toggle('dropdown')}>Ocultar</Button>
-                              <Button size='sm' onClick={this.addToEdition} color="primary">Añadir a la lista</Button>{' '}
+                              <Button size='sm' color="secondary" onClick={()=>this.toggle('modal')}>Ocultar</Button>
+                              <Button size='sm' onClick={()=>this.flush('items','itemsEdition')} color="primary">Añadir a la lista</Button>{' '}
                             </ModalFooter>
                           </Modal>
                         </div>
-                      </CardHeader>
 
-										</Card>
-      					    <br/>
-      					  </Col>
-
-									<Col md={12}>
-										<Card className='shadow'>
-											<CardHeader tag="h5">
-												Edición
-												<ButtonDropdown size='sm' style={{float: 'right'}} isOpen={this.state.dropdown} toggle={this.toggle}>
-      									  <DropdownToggle caret>
-      									    Acciones
-      									  </DropdownToggle>
-      									  <DropdownMenu>
-      									    <DropdownItem onClick={this.listToSearch}>Quitar item(s)</DropdownItem>
-      									  </DropdownMenu>
-      									</ButtonDropdown>
 											</CardHeader>
 											<CardBody>
                         <List 
                          items={this.state.itemsEdition}
-                         
+                         change={this.changeInputsEditor}
                          filter={false}
                          noItemLabel={'Ningun producto seleccionado'}/>
                       </CardBody>

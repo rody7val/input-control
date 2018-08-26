@@ -105,7 +105,7 @@ export default class App extends Component {
 }
 
 const _404 = () => (
-  <Container style={{padding: '50px'}}>
+  <Container style={{padding: '50px', minHeight: '-webkit-fill-available'}}>
     <h1 className='text-center'>INSUMAX</h1>
     <br/>
     <h1 className='text-center'><code>404 - Extraviado</code></h1>
@@ -114,7 +114,7 @@ const _404 = () => (
 );
 
 const _403 = () => (
-  <Container style={{padding: '50px'}}>
+  <Container style={{padding: '50px', minHeight: '-webkit-fill-available'}}>
     <h1 className='text-center'>INSUMAX</h1>
     <br/>
     <h1 className='text-center'><code>403 - Acceso denegado</code></h1>
