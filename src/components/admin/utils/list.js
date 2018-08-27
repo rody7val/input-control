@@ -69,7 +69,7 @@ export default class List extends React.Component {
                         </div>
                       }
                       checked={item.done}
-                      onChange={change}
+                      onChange={(event) => change("itemsEditor", event)}
                       className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
         					) : null
         				}

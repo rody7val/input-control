@@ -53,7 +53,9 @@ class Admin extends Component {
 										<Route path={`${match.url}/report/stock`} component={Stock} />
 										<Route path={`${match.url}/report/orders`} component={Pedidos} />
 										<Route path={`${match.url}/report/motions/buy`} component={Compras} />
-										<Route path={`${match.url}/report/motions/sale`} component={Ventas} />
+										<Route path={`${match.url}/report/motions/sale`} render={() => (
+											<Ventas user={user} />
+										)} />
                     <Route exact path={`${match.url}/report/users`} component={userList} />
                     <Route path={`${match.url}/report/users/:uid`} component={userView} />
 									</div>
