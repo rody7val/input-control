@@ -24,19 +24,21 @@ export default class Buy extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      //toggle
       modal: false,
       dropdown: false,
-      searchTerm: '',
+      //motion
       items: [],
       itemsEdition: [],
+      searchTerm: '',
       grossTotal: 0,
       netTotal: 0,
       date: moment().format('YYYY-MM-DD'),
     }
     
-    this.changeMotion = this.changeMotion.bind(this)
     this.toggle = this.toggle.bind(this)
-    this.change = this.change.bind(this)
+    this.changeMotion = this.changeMotion.bind(this)
+    this.changeEdit = this.changeEdit.bind(this)
     this.collapse = this.collapse.bind(this)
     this.changeInputs = this.changeInputs.bind(this)
     this.searchUpdated = this.searchUpdated.bind(this)
@@ -59,7 +61,7 @@ export default class Buy extends Component {
     })
   }
 
-  change(index, event) {
+  changeEdit(index, event) {
     const target = event.target
     const value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name
@@ -79,12 +81,18 @@ export default class Buy extends Component {
         [index]: {[name]: {$set: value}}
       })
     })
+
+    this.calc()
   }
 
   collapse(index, event) {
     this.setState({
       itemsEdition: update(this.state.itemsEdition, {
-        [index]: {collapse: {$set: !this.state.itemsEdition[index].collapse}}
+        [index]: {
+          collapse: {
+            $set: !this.state.itemsEdition[index].collapse
+          }
+        }
       })
     });
   }
@@ -96,7 +104,11 @@ export default class Buy extends Component {
     
     this.setState({
       [type]: update(this.state[type], {
-        [position]: {done: {$set: value}}
+        [position]: {
+          done: {
+            $set: value
+          }
+        }
       })
     });
   }
@@ -107,12 +119,10 @@ export default class Buy extends Component {
 
   flushItems(from, to){
     // agregar items froms
-    this.state[from].forEach( (item, index) => {
-      this.setState({
-        [to]: update(this.state[to], {
-          $push: this.state[from].filter(item => { return item.done })
-        })
-      });
+    this.setState({
+      [to]: update(this.state[to], {
+        $push: this.state[from].filter(item => { return item.done })
+      })
     });
     // Limpiar editor
     this.setState({
@@ -123,7 +133,26 @@ export default class Buy extends Component {
   }
 
   calc(){
+    let motinData = this.state.itemsEdition.map(item => { 
+      return {
+        grossTotal: item._qty * item._buyPrice,
+        netTotal: item._qty * item._salePrice
+      }
+    });
 
+    Array.prototype.joinBy = function(key) {
+      var suma = 0;
+      Array.forEach(item => {
+        suma = suma + Array[key]
+      })
+      return suma
+    };
+    
+    // this.setState({
+    //   grossTotal: this.state.itemsEdition.map(),
+    //   netTotal:
+    // })
+    console.log(motinData)
   }
 
   componentWillMount() {
@@ -234,16 +263,16 @@ export default class Buy extends Component {
                                     <CardBody>
                                       <FormGroup>
                                         <Label for="qty">Stock</Label>
-                                        <Input required onChange={(event) => this.change(index, event)} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
+                                        <Input required onChange={(event) => this.changeEdit(index, event)} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
                                         <Label for="price">Pcio. Compra</Label>
                                         <InputGroup>
                                           <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                          <Input required onChange={(event) => this.change(index, event)} value={item._buyPrice} step='0.05' type="number" name="_buyPrice" id="price" placeholder="Precio de compra" />
+                                          <Input required onChange={(event) => this.changeEdit(index, event)} value={item._buyPrice} step='0.05' type="number" name="_buyPrice" id="price" placeholder="Precio de compra" />
                                         </InputGroup>
                                         <Label for="salePrice">Pcio. Venta</Label>
                                         <InputGroup>
                                           <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                          <Input required onChange={(event) => this.change(index, event)} value={item._salePrice} step='0.05' type="number" name="_salePrice" id="salePrice" placeholder="Precio de venta" />
+                                          <Input required onChange={(event) => this.changeEdit(index, event)} value={item._salePrice} step='0.05' type="number" name="_salePrice" id="salePrice" placeholder="Precio de venta" />
                                         </InputGroup>
                                         <FormText><Badge color={item.gain > 10 ? 'success' : 'danger' }>{item.gain}%</Badge> de ganancia</FormText>
                                       </FormGroup>
@@ -268,7 +297,7 @@ export default class Buy extends Component {
                         <FormGroup>
                           <Label for="date">Fecha</Label>
                           <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
-                          <Label for="user">Usuario {user.name}</Label>
+                          <Label for="user">Usuario</Label>
                           <Input required type="text" name="user" id="user" />
                           <Input required type="text" readonly name="userName" id="user" />
                           <Label for="total">Total Bruto</Label>
