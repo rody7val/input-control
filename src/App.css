@@ -27,8 +27,8 @@
 	width: 100%
 }
 .list-group-item.active{
-	background-color: #17a2b8;
-	border-color: #1798b8;
+	background-color: #6c757d;
+	border-color: #6c757d;
 }
 label.custom-control-label{
 	width: 100%;

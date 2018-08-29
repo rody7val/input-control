@@ -20,7 +20,7 @@ function addProperties(snapshot) {
 	return item
 }
 
-export default class Buy extends Component {
+export default class Sale extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -42,7 +42,8 @@ export default class Buy extends Component {
     this.collapse = this.collapse.bind(this)
     this.changeInputs = this.changeInputs.bind(this)
     this.searchUpdated = this.searchUpdated.bind(this)
-    this.flushItems = this.flushItems.bind(this)    
+    this.flushItems = this.flushItems.bind(this)
+    this.calc = this.calc.bind(this)
   }
 
   toggle(type) {
@@ -68,9 +69,25 @@ export default class Buy extends Component {
 
     //calcular % de ganancia
     if (name === '_salePrice') {
-      let dif = Number(Number(value - this.state.itemsEdition[index]._buyPrice).toFixed(2));
-      let porcentaje = Number(Number(dif / value).toFixed(2));
-      let gain = porcentaje > 0 ? Number(Number(porcentaje * 100).toFixed(2)) : 0;
+
+      let dif = Number(
+        Number( value - this.state.itemsEdition[index]._buyPrice ).toFixed(2)
+      )
+
+      let porcentaje = Number(
+        Number( dif / value ).toFixed(2)
+      )
+
+      let gain = porcentaje > 0 ? Number(
+        Number(
+          this.state.itemsEdition[index]._buyPrice * porcentaje
+        ).toFixed(2)
+      ) : 0;
+
+      console.log('value', value)
+      console.log('dif', dif)
+      console.log('porcentaje', porcentaje)
+      console.log('gain', gain)
 
       this.state.itemsEdition[index].gain = gain;
       this.forceUpdate()
@@ -78,11 +95,13 @@ export default class Buy extends Component {
 
     this.setState({
       itemsEdition: update(this.state.itemsEdition, {
-        [index]: {[name]: {$set: value}}
+        [index]: {
+          [name]: {
+            $set: value
+          }
+        }
       })
     })
-
-    this.calc()
   }
 
   collapse(index, event) {
@@ -118,13 +137,13 @@ export default class Buy extends Component {
   }
 
   flushItems(from, to){
-    // agregar items froms
+    // agregar items al editor o buscador
     this.setState({
       [to]: update(this.state[to], {
         $push: this.state[from].filter(item => { return item.done })
       })
     });
-    // Limpiar editor
+    // Limpiar editor o buscador
     this.setState({
      [from]: this.state[from].filter(item => {
         return item.done == false
@@ -133,26 +152,21 @@ export default class Buy extends Component {
   }
 
   calc(){
-    let motinData = this.state.itemsEdition.map(item => { 
-      return {
-        grossTotal: item._qty * item._buyPrice,
-        netTotal: item._qty * item._salePrice
+    var grossTotal = 0;
+    var netTotal = 0;
+
+    this.state.itemsEdition.map(item => {
+      if (item.done){
+        grossTotal = grossTotal + (item._qty * item._buyPrice);
+        netTotal = netTotal + (item._qty * item._salePrice);
       }
     });
 
-    Array.prototype.joinBy = function(key) {
-      var suma = 0;
-      Array.forEach(item => {
-        suma = suma + Array[key]
-      })
-      return suma
-    };
-    
-    // this.setState({
-    //   grossTotal: this.state.itemsEdition.map(),
-    //   netTotal:
-    // })
-    console.log(motinData)
+    this.setState({
+      grossTotal: grossTotal,
+      netTotal: netTotal
+    })
+    console.log(this.state.grossTotal, this.state.netTotal)
   }
 
   componentWillMount() {
@@ -195,14 +209,22 @@ export default class Buy extends Component {
                             </DropdownToggle>
                             <DropdownMenu>
                             {
-                              this.state.itemsEdition.length > 0
-                              ? <DropdownItem onClick={()=>this.flushItems('itemsEdition', 'items')}>Quitar item(s)</DropdownItem>
-                              : <DropdownItem disabled style={{cursor: 'not-allowed'}}>Quitar item(s)</DropdownItem>
+                              this.state.itemsEdition.length > 0 ? (
+                                <div>
+                                  <DropdownItem onClick={()=>this.flushItems('itemsEdition', 'items')}>Quitar item(s)</DropdownItem>
+                                  <DropdownItem onClick={this.calc}>Calcular montos</DropdownItem>
+                                </div>
+                              ) : (
+                                <div>
+                                  <DropdownItem disabled style={{cursor: 'not-allowed'}}>Quitar item(s)</DropdownItem>
+                                  <DropdownItem disabled style={{cursor: 'not-allowed'}}>Calcular montos</DropdownItem>
+                                </div>
+                              )
                             }
                             </DropdownMenu>
                           </ButtonDropdown>
 
-                          <Button color='info' size='sm' onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar</Button>
+                          <Button color='primary' size='sm' onClick={()=>this.toggle('modal')} style={{float: 'right'}}>Buscar</Button>
                           <Modal size='lg' isOpen={this.state.modal} toggle={()=>this.toggle('modal')}>
                             <ModalHeader toggle={()=>this.toggle('modal')}>
                               <SearchInput onChange={this.searchUpdated} />
@@ -220,7 +242,7 @@ export default class Buy extends Component {
                                         <div>
                                           {item.name}{' '}
                                           <small>- {item.desc}</small>{' '}
-                                          <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty + Number(item._qty)}</Badge>
+                                          <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
                                         </div>
                                       }
                                       checked={item.done}
@@ -251,7 +273,7 @@ export default class Buy extends Component {
                                   label={
                                     <div>
                                       {item.name}{' '}
-                                      <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty + Number(item._qty)}</Badge>
+                                      <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
                                       <Button size='sm' onClick={(event) => this.collapse(index, event)} style={{float: 'right'}}>{item.collapse ? 'Close' : 'Edit'}</Button>
                                     </div>
                                   }
@@ -261,21 +283,33 @@ export default class Buy extends Component {
                                 <Collapse isOpen={item.collapse}>
                                   <Card>
                                     <CardBody>
-                                      <FormGroup>
-                                        <Label for="qty">Stock</Label>
-                                        <Input required onChange={(event) => this.changeEdit(index, event)} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
-                                        <Label for="price">Pcio. Compra</Label>
-                                        <InputGroup>
-                                          <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                          <Input required onChange={(event) => this.changeEdit(index, event)} value={item._buyPrice} step='0.05' type="number" name="_buyPrice" id="price" placeholder="Precio de compra" />
-                                        </InputGroup>
-                                        <Label for="salePrice">Pcio. Venta</Label>
-                                        <InputGroup>
-                                          <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                          <Input required onChange={(event) => this.changeEdit(index, event)} value={item._salePrice} step='0.05' type="number" name="_salePrice" id="salePrice" placeholder="Precio de venta" />
-                                        </InputGroup>
-                                        <FormText><Badge color={item.gain > 10 ? 'success' : 'danger' }>{item.gain}%</Badge> de ganancia</FormText>
-                                      </FormGroup>
+                                      <Row>
+                                        <Col>
+                                          <FormGroup>
+                                            <Label for="qty">Cantidad</Label>
+                                            <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
+                                            <Label for="price">Pcio. Compra</Label>
+                                            <InputGroup>
+                                              <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                                              <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._buyPrice} step='0.05' type="number" name="_buyPrice" id="price" placeholder="Precio de compra" />
+                                            </InputGroup>
+                                            <Label for="salePrice">Pcio. Venta</Label>
+                                            <InputGroup>
+                                              <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                                              <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._salePrice} step='0.05' type="number" name="_salePrice" id="salePrice" placeholder="Precio de venta" />
+                                            </InputGroup>
+                                          </FormGroup>
+                                        </Col>
+
+                                      <Col>
+                                        <FormGroup>
+                                          <Label>Margen Bruto</Label>
+                                          <InputGroup>
+                                            <Badge color={item.gain > 10 ? 'success' : 'danger' }>{item.gain}%</Badge>
+                                          </InputGroup>
+                                        </FormGroup>
+                                      </Col>
+                                      </Row>
                                     </CardBody>
                                   </Card>
                                 </Collapse>
@@ -295,15 +329,37 @@ export default class Buy extends Component {
                     <CardBody>
                       <Form onSubmit={this.crear}>
                         <FormGroup>
-                          <Label for="date">Fecha</Label>
-                          <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
-                          <Label for="user">Usuario</Label>
-                          <Input required type="text" name="user" id="user" />
-                          <Input required type="text" readonly name="userName" id="user" />
-                          <Label for="total">Total Bruto</Label>
-                          <Input required type="number" readonly onChange={this.changeMotion} value={this.state.grossTotal} name="grossTotal" id="grossTotal" />
-                          <Label for="total">Total Neto</Label>
-                          <Input required type="number" readonly onChange={this.changeMotion} value={this.state.netTotal} name="netTotal" id="netTotal" />
+                          <Row>
+                            <Col>
+                              <Label for="date">Fecha</Label>
+                              <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
+                              <Label for="user">Usuario</Label>
+                              <Input required type="text" name="user" id="user" />
+                              <Input required type="text" readonly name="userName" id="user" />
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col>
+                              <Label for="total">Total Bruto</Label>
+                              <InputGroup>
+                                <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                                <Input required type="number" readOnly value={this.state.grossTotal} name="grossTotal" id="grossTotal" />
+                              </InputGroup>
+                              <Label for="total">Total Neto</Label>
+                              <InputGroup>
+                                <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                                <Input required type="number" readOnly value={this.state.netTotal} name="netTotal" id="netTotal" />
+                              </InputGroup>
+                            </Col>
+                            <Col>
+                              <FormGroup>
+                                <Label>Margen Bruto</Label>
+                                <InputGroup>
+                                  <Badge color='success'>{(this.state.grossTotal / this.state.netTotal) * 100}%</Badge>
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                          </Row>
                         </FormGroup>
                       </Form>
                     </CardBody>
