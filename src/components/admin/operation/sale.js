@@ -19,6 +19,9 @@ function addProperties(snapshot) {
   item._buyPrice = 0
 	return item
 }
+function getlength(number) {
+  return number.toString().length;
+}
 
 export default class Sale extends Component {
   constructor(props) {
@@ -34,6 +37,7 @@ export default class Sale extends Component {
       grossTotal: 0,
       netTotal: 0,
       date: moment().format('YYYY-MM-DD'),
+      gain: 0
     }
     
     this.toggle = this.toggle.bind(this)
@@ -70,21 +74,16 @@ export default class Sale extends Component {
     //calcular % de ganancia
     if (name === '_salePrice') {
 
-      let dif = Number(
-        Number( value - this.state.itemsEdition[index]._buyPrice ).toFixed(2)
-      )
-
-      let porcentaje = Number(
-        Number( dif / value ).toFixed(2)
-      )
-
+      let dif = Number(value - this.state.itemsEdition[index]._buyPrice);
+      let porcentaje =  Number(dif / value);
       let gain = porcentaje > 0 ? Number(
         Number(
-          this.state.itemsEdition[index]._buyPrice * porcentaje
+          value * porcentaje
         ).toFixed(2)
       ) : 0;
 
-      console.log('value', value)
+      console.log('---item---')
+      console.log('ventas', value)
       console.log('dif', dif)
       console.log('porcentaje', porcentaje)
       console.log('gain', gain)
@@ -152,21 +151,41 @@ export default class Sale extends Component {
   }
 
   calc(){
-    var grossTotal = 0;
-    var netTotal = 0;
+    let compras = 0;
+    let ventas = 0;
 
     this.state.itemsEdition.map(item => {
       if (item.done){
-        grossTotal = grossTotal + (item._qty * item._buyPrice);
-        netTotal = netTotal + (item._qty * item._salePrice);
+        compras = Number(
+          compras + (item._qty * item._buyPrice)
+        );
+        ventas = Number(
+          ventas + (item._qty * item._salePrice)
+        );
       }
     });
 
+    let dif = Number(ventas - compras);
+    let porcentaje = Number(dif / ventas);
+
+    let gain = porcentaje > 0 ? Number(
+      Number(
+        ventas * porcentaje
+      ).toFixed(2)
+    ) : 0;
+
+    console.log('---motion---')
+    console.log('ventas', ventas)
+    console.log('dif', dif)
+    console.log('porcentaje', porcentaje)
+    console.log('gain', gain)
+
     this.setState({
-      grossTotal: grossTotal,
-      netTotal: netTotal
+      grossTotal: compras,
+      netTotal: ventas,
+      gain: gain
     })
-    console.log(this.state.grossTotal, this.state.netTotal)
+    
   }
 
   componentWillMount() {
@@ -189,7 +208,7 @@ export default class Sale extends Component {
 
 		return (
 			<div>
-			<h3 className='title'>Venta</h3>
+			<h3 className='title'>Venta {user.displayName}</h3>
 			<Row>
 				<Col md={12}>
 					<Card className='shadow'>
@@ -303,9 +322,9 @@ export default class Sale extends Component {
 
                                       <Col>
                                         <FormGroup>
-                                          <Label>Margen Bruto</Label>
+                                          <Label>% de Ganancia</Label>
                                           <InputGroup>
-                                            <Badge color={item.gain > 10 ? 'success' : 'danger' }>{item.gain}%</Badge>
+                                            <Badge color={item.gain == 0 ? 'danger' : (item.gain >= 10 ? 'success' : 'warning')}>{item.gain}%</Badge>
                                           </InputGroup>
                                         </FormGroup>
                                       </Col>
@@ -334,30 +353,22 @@ export default class Sale extends Component {
                               <Label for="date">Fecha</Label>
                               <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
                               <Label for="user">Usuario</Label>
-                              <Input required type="text" name="user" id="user" />
-                              <Input required type="text" readonly name="userName" id="user" />
+                              <Input required type="text" name="user" id="userKey" value={user.uid} />
+                              <Input required type="text" readonly name="userName" id="userName" value={user.displayName} />
                             </Col>
                           </Row>
                           <Row>
                             <Col>
-                              <Label for="total">Total Bruto</Label>
+                              <Label for="total">Pcio. Compra Total</Label>
                               <InputGroup>
                                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                                 <Input required type="number" readOnly value={this.state.grossTotal} name="grossTotal" id="grossTotal" />
                               </InputGroup>
-                              <Label for="total">Total Neto</Label>
+                              <Label for="total">Pcio. Venta Total</Label>
                               <InputGroup>
                                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                                 <Input required type="number" readOnly value={this.state.netTotal} name="netTotal" id="netTotal" />
                               </InputGroup>
-                            </Col>
-                            <Col>
-                              <FormGroup>
-                                <Label>Margen Bruto</Label>
-                                <InputGroup>
-                                  <Badge color='success'>{(this.state.grossTotal / this.state.netTotal) * 100}%</Badge>
-                                </InputGroup>
-                              </FormGroup>
                             </Col>
                           </Row>
                         </FormGroup>

@@ -27,6 +27,9 @@ const DashboardUser = ({match}) => <p>Dasboard user <code>{match.url}</code>.</p
 const PedidosUser = ({match}) => <p>Gestion de pedidos <code>{match.url}</code>.</p>;
 
 class Admin extends Component {
+  constructor(props) {
+    super(props)
+  }
 	render() {
 		const { match, user } = this.props
 
@@ -46,7 +49,9 @@ class Admin extends Component {
 										<Route path={`${match.url}/register/product`} component={Producto} />
 
 										<Route path={`${match.url}/operation/buy`} component={Compra} />
-										<Route path={`${match.url}/operation/sale`} component={Venta} />
+										<Route path={`${match.url}/operation/sale`} render={() => (
+											<Venta user={user} />
+										)} />
 										<Route path={`${match.url}/operation/order`} component={Presupuesto} />
 										<Route path={`${match.url}/operation/manual-registration`} component={RegistroManual} />
 
