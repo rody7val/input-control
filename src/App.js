@@ -18,45 +18,51 @@ export default class App extends Component {
     }
   }
 
-  componentWillMount = () => {
+  componentDidMount() {
+    firebase.database()
+      .ref('load')
+      .on('value', snapshot => {
+        this.setState({ load: snapshot.val() })
+      })
+  }
+
+  componentWillMount() {
     firebase.auth().onAuthStateChanged(user => {
-      var _user = user || {};
-      var myVar;
-      myVar = setTimeout(() => {
-        firebase.database()
+      if (user) {
+        return firebase.database()
           .ref(`users/list/${user.uid}`)
           .on('value', snapshot => {
             if (snapshot.val() && snapshot.val().active) {
               this.setState({load: false})
-              console.log('clear!')  
-              clearTimeout(myVar);
+              console.log('clear!')
             }
-            _user.admin = snapshot.val().admin
-            _user.active = snapshot.val().active
-            _user.created = snapshot.val().created
-            this.setState({ user: _user })
+            user.admin = snapshot.val().admin
+            user.active = snapshot.val().active
+            user.created = snapshot.val().created
+            this.setState({ user: user })
         })
-      }, 3000);
+      }
+      
+      this.setState({user: null})
     })
   }
 
-  auth = (cb) => {
-    this.setState({ load: true })
+  auth(cb) {
     const provider = new firebase.auth.GoogleAuthProvider()
+    firebase.database().ref('load').set(true);
     firebase.auth().signInWithPopup(provider)
       .then(result => {
         this.setState({user: result.user})
         cb()
       })
       .catch(error => {
-        this.setState({load: false})
+        firebase.database().ref('load').set(false);
         console.log(`Error ${error.code}: ${error.message}`)
       })
   }
 
-  signout = (cb) => {
+  signout(cb) {
     firebase.auth().signOut().then(result => {
-      this.setState({user: null})
       cb()
     })
     .catch(error => {
@@ -91,7 +97,7 @@ export default class App extends Component {
             
             <Modal isOpen={this.state.load} >
               <ModalBody>
-                <p className='lead'>Registrando..</p>
+                <p className='lead'>Cargando...</p>
               </ModalBody>
             </Modal>
 
@@ -119,6 +125,10 @@ const _403 = () => (
     <br/>
     <h1 className='text-center'><code>403 - Acceso denegado</code></h1>
     <p className='text-center lead'>¿No encuentras lo que estás buscando? <Link to='/'>Ve a la página principal</Link></p>
-    <p className='text-center lead'>¿No estas registrado? <Button onClink={this.auth} color='primary'>Rigistrarme</Button></p>
+    <p className='text-center lead'>¿No estas registrado? <Button onClink={()=>{ 
+      this.auth(() => {
+        console.log('auth')
+      }) 
+    }} color='primary'>Rigistrarme</Button></p>
   </Container>
 );

@@ -15,8 +15,8 @@ function addProperties(snapshot) {
   item.gain = 0
   item.qty = item.qty || 0
   item._qty = 0
-  item._salePrice = 0
-  item._buyPrice = 0
+  item._buyPrice = item._buyPrice || 0
+  item._salePrice = item._salePrice || 0
   return item
 }
 function getlength(number) {
@@ -72,10 +72,10 @@ export default class Sale extends Component {
       _items: this.state.itemsEdition.map(item => {
         return {
           key: item.key,
-          qty: item.qty,
-          _qty: item._qty,
-          _salePrice: item._salePrice,
-          _buyPrice: item._buyPrice,
+          qty: Number(item.qty + Number(item._qty)),
+          _qty: Number(item._qty),
+          _salePrice: Number(item._salePrice),
+          _buyPrice: Number(item._buyPrice),
           gain: item.gain
         }
       }),
@@ -87,8 +87,8 @@ export default class Sale extends Component {
         })
       ),
       _user: this.state._user,
-      buyTotal: this.state.buyTotal,
-      saleTotal: this.state.saleTotal,
+      buyTotal: Number(this.state.buyTotal),
+      saleTotal: Number(this.state.saleTotal),
       gain: this.state.gain
     }
 

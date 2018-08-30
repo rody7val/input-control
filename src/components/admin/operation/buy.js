@@ -72,10 +72,10 @@ export default class Sale extends Component {
       _items: this.state.itemsEdition.map(item => {
         return {
           key: item.key,
-          qty: item.qty,
-          _qty: item._qty,
-          _salePrice: item._salePrice,
-          _buyPrice: item._buyPrice,
+          qty: Number(item.qty + Number(item._qty)),
+          _qty: Number(item._qty),
+          _salePrice: Number(item._salePrice),
+          _buyPrice: Number(item._buyPrice),
           gain: item.gain
         }
       }),
@@ -87,8 +87,8 @@ export default class Sale extends Component {
         })
       ),
       _user: this.state._user,
-      buyTotal: this.state.buyTotal,
-      saleTotal: this.state.saleTotal,
+      buyTotal: Number(this.state.buyTotal),
+      saleTotal: Number(this.state.saleTotal),
       gain: this.state.gain
     }
 

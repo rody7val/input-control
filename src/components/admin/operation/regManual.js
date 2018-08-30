@@ -15,8 +15,8 @@ function addProperties(snapshot) {
   item.gain = 0
   item.qty = item.qty || 0
   item._qty = 0
-  item._salePrice = 0
-  item._buyPrice = 0
+  item._buyPrice = item._buyPrice || 0
+  item._salePrice = item._salePrice || 0
 	return item
 }
 function getlength(number) {
@@ -35,12 +35,14 @@ export default class Sale extends Component {
     super(props)
     this.state = {
       //toggle
+      load: false,
       modal: false,
       dropdown: false,
       // front
       items: [],
       itemsEdition: [],
       searchTerm: '',
+      changes: false,
       //motion
       type: 'REG-MANUAL',
       date: moment().format('YYYY-MM-DD'),
@@ -72,10 +74,10 @@ export default class Sale extends Component {
       _items: this.state.itemsEdition.map(item => {
         return {
           key: item.key,
-          qty: item.qty,
-          _qty: item._qty,
-          _salePrice: item._salePrice,
-          _buyPrice: item._buyPrice,
+          qty: Number(item.qty + Number(item._qty)),
+          _qty: Number(item._qty),
+          _salePrice: Number(item._salePrice),
+          _buyPrice: Number(item._buyPrice),
           gain: item.gain
         }
       }),
@@ -87,19 +89,17 @@ export default class Sale extends Component {
         })
       ),
       _user: this.state._user,
-      buyTotal: this.state.buyTotal,
-      saleTotal: this.state.saleTotal,
+      buyTotal: Number(this.state.buyTotal),
+      saleTotal: Number(this.state.saleTotal),
       gain: this.state.gain
     }
-
-    alert(JSON.stringify(motion, null, 2));
 
     firebase.database()
       .ref(`motions/${motion.type}/list`)
       .push()
       .set(motion)
       .then(() => {
-        alert('Registro manual creado!')
+        firebase.database().ref('load').set(true);
       }).catch((err) => {
         errors = true
         alert(err)
@@ -122,7 +122,6 @@ export default class Sale extends Component {
         gain: 0
       })
       event.target.reset()
-      this.getAll()
     }
   }
 
@@ -158,17 +157,12 @@ export default class Sale extends Component {
         ).toFixed(2)
       ) : 0;
 
-      console.log('---item---')
-      console.log('ventas', value)
-      console.log('dif', dif)
-      console.log('porcentaje', porcentaje)
-      console.log('gain', gain)
-
       this.state.itemsEdition[index].gain = gain;
       this.forceUpdate()
     }
 
     this.setState({
+    	changes: true,
       itemsEdition: update(this.state.itemsEdition, {
         [index]: {
           [name]: {
@@ -197,6 +191,7 @@ export default class Sale extends Component {
     let value = !this.state[type][position].done;
     
     this.setState({
+    	changes: true,
       [type]: update(this.state[type], {
         [position]: {
           done: {
@@ -208,6 +203,7 @@ export default class Sale extends Component {
   }
 
   searchUpdated(term) {
+
     this.setState({searchTerm: term})
   }
 
@@ -233,19 +229,28 @@ export default class Sale extends Component {
     this.state.itemsEdition.map(item => {
       if (item.done){
         compras = Number(
-          compras + (item._qty * item._buyPrice)
+          compras + (Math.abs(item._qty) * item._buyPrice)
         );
         ventas = Number(
-          ventas + (item._qty * item._salePrice)
+          ventas + (Math.abs(item._qty) * item._salePrice)
         );
       }
     });
 
-    let gain = Number(
-      Number( (compras * 100) / ventas).toFixed(2)
-    ) || 0;
+      let dif = Number(ventas - compras);
+      let porcentaje =  Number(dif / ventas);
+      let gain = porcentaje > 0 ? Number(
+        Number(
+          ventas * porcentaje
+        ).toFixed(2)
+      ) : 0;
+
+    // let gain = Number(
+    //   Number( (compras * 100) / ventas).toFixed(2)
+    // ) || 0;
 
     this.setState({
+    	changes: false,
       buyTotal: compras,
       saleTotal: ventas,
       gain: gain
@@ -266,8 +271,14 @@ export default class Sale extends Component {
         })
       })
   }
+
   componentWillMount() {
-  	this.getAll()
+    firebase.database().ref('load').on('value', snapshot => {
+    	if (!snapshot.val()) {
+  			this.getAll()
+    	}
+      this.setState({ load: snapshot.val() })
+    })
   }
 
 	render() {
@@ -276,6 +287,11 @@ export default class Sale extends Component {
 
 		return (
 			<div>
+			<Modal isOpen={this.state.load} >
+        <ModalBody>
+          <p className='lead text-center'>Guardando...</p>
+        </ModalBody>
+      </Modal>
 			<h3 className='title'>Registro Manual</h3>
 			<Row>
 				<Col md={12}>
@@ -419,7 +435,9 @@ export default class Sale extends Component {
                           <Row>
                             <Col>
                               <Label for="date">Fecha</Label>
-                              <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
+                              <Input readOnly type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
+                              <Label for="user">Usuario</Label>
+                              <Input readOnly type="text" name="user" value={this.props.user.displayName} id="userId" />
                             </Col>
                           </Row>
                           <Row>
@@ -445,11 +463,18 @@ export default class Sale extends Component {
                             </Col>
                           </Row>
                         </FormGroup>
-                        {
-                          this.state.itemsEdition.length
-                          ? <Button color='primary'>Guardar</Button>
-                          : <Button style={{cursor: 'not-allowed'}} color='primary' outline disabled>Guardar</Button>
-                        }
+                        <FormGroup>
+                        	{
+                        	  this.state.itemsEdition.length && !this.state.changes ? (
+                        	  	<Button color='primary'>Guardar</Button>
+                        	  ) : (
+                        	  	<div>
+                        	  		<Button style={{cursor: 'not-allowed'}} color='primary' outline disabled>Guardar</Button>
+                        	  		<FormText color="muted">Actualiza los cambios</FormText>
+                        	  	</div>
+                        	  )
+                        	}
+                        </FormGroup>
                       </Form>
                     </CardBody>
                   </Card>

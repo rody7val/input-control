@@ -19,6 +19,8 @@ class Menu extends Component {
     this.state = {
       isOpen: false
     }
+    this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
     this.toggle = this.toggle.bind(this)
   }
 
@@ -28,13 +30,13 @@ class Menu extends Component {
     });
   }
 
-  login = () => {
+  login() {
     this.props.auth(() => {
       console.log('auth')
     })
   }
 
-  logout = () => {
+  logout() {
     this.props.signout(() => {
       console.log('auth')
     })

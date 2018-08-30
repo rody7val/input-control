@@ -114,8 +114,7 @@ class Producto extends Component {
       desc: this.state.desc,
       img: this.state.img,
       qty: 0,
-      buyPrice: 0,
-      salePrice: 0,
+      price: 0,
       categories: prepareCategoriesForSave(this.state.categories),
       provider: prepareProviderForSave(this.state.provider),
       created: moment().valueOf()
