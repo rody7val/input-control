@@ -8,8 +8,8 @@ import { Collapse, FormGroup, Label, InputGroup, InputGroupAddon, FormText, Row,
 const KEYS_TO_FILTERS = ['name', 'desc']
 
 function addProperties(snapshot) {
-	let item = snapshot.val()
-	item.key = snapshot.key
+  let item = snapshot.val()
+  item.key = snapshot.key
   item.collapse = false
   item.done = false
   item.gain = 0
@@ -17,10 +17,17 @@ function addProperties(snapshot) {
   item._qty = 0
   item._salePrice = 0
   item._buyPrice = 0
-	return item
+  return item
 }
 function getlength(number) {
   return number.toString().length;
+}
+function prepareForSave(arr){
+  var returnObj = {};
+  arr.forEach(item => {
+    returnObj[item.key] = true
+  });
+  return returnObj;
 }
 
 export default class Sale extends Component {
@@ -30,13 +37,17 @@ export default class Sale extends Component {
       //toggle
       modal: false,
       dropdown: false,
-      //motion
+      // front
       items: [],
       itemsEdition: [],
       searchTerm: '',
-      grossTotal: 0,
-      netTotal: 0,
+      //motion
+      type: 'REG-MANUAL',
       date: moment().format('YYYY-MM-DD'),
+      _items: [],
+      _user: this.props.user.uid,
+      buyTotal: 0,
+      saleTotal: 0,
       gain: 0
     }
     
@@ -48,6 +59,71 @@ export default class Sale extends Component {
     this.searchUpdated = this.searchUpdated.bind(this)
     this.flushItems = this.flushItems.bind(this)
     this.calc = this.calc.bind(this)
+    this.save = this.save.bind(this)
+  }
+
+  save(event){
+    event.preventDefault();
+    let errors = false;
+
+    var motion = {
+      type: this.state.type,
+      date: this.state.date,
+      _items: this.state.itemsEdition.map(item => {
+        return {
+          key: item.key,
+          qty: item.qty,
+          _qty: item._qty,
+          _salePrice: item._salePrice,
+          _buyPrice: item._buyPrice,
+          gain: item.gain
+        }
+      }),
+      members: prepareForSave(
+        this.state.itemsEdition.map(item => {
+          return {
+            key: item.key
+          }
+        })
+      ),
+      _user: this.state._user,
+      buyTotal: this.state.buyTotal,
+      saleTotal: this.state.saleTotal,
+      gain: this.state.gain
+    }
+
+    alert(JSON.stringify(motion, null, 2));
+
+    firebase.database()
+      .ref(`motions/${motion.type}/list`)
+      .push()
+      .set(motion)
+      .then(() => {
+        alert('Registro manual creado!')
+      }).catch((err) => {
+        errors = true
+        alert(err)
+      })
+
+    if (!errors) {
+      // reset state
+      this.setState({
+        // front
+        items: [],
+        itemsEdition: [],
+        searchTerm: '',
+        //motion
+        type: 'REG-MANUAL',
+        date: moment().format('YYYY-MM-DD'),
+        _items: [],
+        _user: this.props.user.uid,
+        buyTotal: 0,
+        saleTotal: 0,
+        gain: 0
+      })
+      event.target.reset()
+      this.getAll()
+    }
   }
 
   toggle(type) {
@@ -165,61 +241,53 @@ export default class Sale extends Component {
       }
     });
 
-    let dif = Number(ventas - compras);
-    let porcentaje = Number(dif / ventas);
-
-    let gain = porcentaje > 0 ? Number(
-      Number(
-        ventas * porcentaje
-      ).toFixed(2)
-    ) : 0;
-
-    console.log('---motion---')
-    console.log('ventas', ventas)
-    console.log('dif', dif)
-    console.log('porcentaje', porcentaje)
-    console.log('gain', gain)
+    let gain = Number(
+      Number( (compras * 100) / ventas).toFixed(2)
+    ) || 0;
 
     this.setState({
-      grossTotal: compras,
-      netTotal: ventas,
+      buyTotal: compras,
+      saleTotal: ventas,
       gain: gain
     })
     
   }
 
+  getAll(){
+    firebase.database()
+      .ref('items/list')
+      .orderByChild('name')
+      .once('value')
+      .then(snapshot => {
+        snapshot.forEach(item => {
+          this.setState({
+            items: this.state.items.concat(addProperties( item )),
+          })
+        })
+      })
+  }
   componentWillMount() {
-  	firebase.database()
-  		.ref('items/list')
-  		.orderByChild('name')
-  		.once('value')
-  		.then(snapshot => {
-  			snapshot.forEach(item => {
-  				this.setState({
-  					items: this.state.items.concat(addProperties( item )),
-  				})
-  			})
-  		})
+    this.getAll()
   }
 
-	render() {
-		const {user} = this.props;
+  render() {
+    const {user} = this.props;
     let filteredItems = this.state.items.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
 
-		return (
-			<div>
-			<h3 className='title'>Venta {user.displayName}</h3>
-			<Row>
-				<Col md={12}>
-					<Card className='shadow'>
-						<CardBody>
-						<Row>
-							<Col md={6} sm={12}>
-								<Row>
-									<Col md={12}>
-										<Card className='shadow'>
-											<CardHeader tag="h5">
-												Edición
+    return (
+      <div>
+      <h3 className='title'>Venta</h3>
+      <Row>
+        <Col md={12}>
+          <Card className='shadow'>
+            <CardBody>
+            <Row>
+              <Col md={6} sm={12}>
+                <Row>
+                  <Col md={12}>
+                    <Card className='shadow'>
+                      <CardHeader tag="h5">
+                        Edición
 
                         <div style={{float: 'right'}}>
                           <ButtonDropdown size='sm' style={{float: 'right'}} isOpen={this.state.dropdown} toggle={()=>this.toggle('dropdown')}>
@@ -252,21 +320,41 @@ export default class Sale extends Component {
                               {filteredItems.map(item => {
                                 return (
                                   <div >
-                                    <CustomInput
-                                      key={item.key}
-                                      id={item.key}
-                                      name='done'
-                                      type="checkbox"
-                                      label={
-                                        <div>
-                                          {item.name}{' '}
-                                          <small>- {item.desc}</small>{' '}
-                                          <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
-                                        </div>
-                                      }
-                                      checked={item.done}
-                                      onChange={(event) => this.changeInputs("items", event)}
-                                      className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+                                    {
+                                      item.qty === 0 ? (
+                                        <CustomInput
+                                          disabled
+                                          key={item.key}
+                                          id={item.key}
+                                          type="checkbox"
+                                          label={
+                                            <div>
+                                              {item.name}{' '}
+                                              <small>- {item.desc}</small>{' '}
+                                              <Badge size='sm' color={item.qty == 0 ? 'danger' : (item.qty >= 6 ? 'success' : 'warning')} pill>{item.qty}</Badge>
+                                            </div>
+                                          }
+                                          checked={item.done}
+                                          className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+                                      ) : (
+                                        <CustomInput
+                                          key={item.key}
+                                          id={item.key}
+                                          name='done'
+                                          type="checkbox"
+                                          label={
+                                            <div>
+                                              {item.name}{' '}
+                                              <small>- {item.desc}</small>{' '}
+                                              <Badge size='sm' color={item.qty == 0 ? 'danger' : (item.qty >= 6 ? 'success' : 'warning')} pill>{item.qty}</Badge>
+                                            </div>
+                                          }
+                                          checked={item.done}
+                                          onChange={(event) => this.changeInputs("items", event)}
+                                          className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+                                      )
+                                    }
+                                  
                                   </div>
                                 )
                               })}
@@ -278,8 +366,8 @@ export default class Sale extends Component {
                           </Modal>
                         </div>
 
-											</CardHeader>
-											<CardBody>
+                      </CardHeader>
+                      <CardBody>
 
                         <ListGroup>
                           {
@@ -292,13 +380,13 @@ export default class Sale extends Component {
                                   label={
                                     <div>
                                       {item.name}{' '}
-                                      <Badge size='sm' color={item.qty > 0 ? 'primary' : 'danger'} pill>{item.qty}</Badge>
+                                      <Badge size='sm' color={item.qty + Number(item._qty) == 0 ? 'danger' : (item.qty + Number(item._qty) >= 6 ? 'success' : 'warning')} pill>{item.qty + Number(item._qty)}</Badge>
                                       <Button size='sm' onClick={(event) => this.collapse(index, event)} style={{float: 'right'}}>{item.collapse ? 'Close' : 'Edit'}</Button>
                                     </div>
                                   }
                                   checked={item.done}
                                   onChange={(event) => this.changeInputs("itemsEdition", event)}
-                                  className={`list-group-item-action list-group-item ${item.done ? 'active' : null}`} />
+                                  className={`list-group-item-action list-group-item shadow ${item.done ? 'active' : null}`} />
                                 <Collapse isOpen={item.collapse}>
                                   <Card>
                                     <CardBody>
@@ -306,7 +394,7 @@ export default class Sale extends Component {
                                         <Col>
                                           <FormGroup>
                                             <Label for="qty">Cantidad</Label>
-                                            <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
+                                            <Input max={0} required onChange={(event) => {this.changeEdit(index, event)}} value={item._qty} type="number" name="_qty" id="_qty" placeholder="Cantidad de unidades" />
                                             <Label for="price">Pcio. Compra</Label>
                                             <InputGroup>
                                               <InputGroupAddon addonType="prepend">$</InputGroupAddon>
@@ -346,15 +434,12 @@ export default class Sale extends Component {
                   <Card className='shadow'>
                   <CardHeader tag="h5">Movimiento</CardHeader>
                     <CardBody>
-                      <Form onSubmit={this.crear}>
+                      <Form onSubmit={this.save}>
                         <FormGroup>
                           <Row>
                             <Col>
                               <Label for="date">Fecha</Label>
                               <Input required type="date" name="date" onChange={this.changeMotion} value={this.state.date} id="date" />
-                              <Label for="user">Usuario</Label>
-                              <Input required type="text" name="user" id="userKey" value={user.uid} />
-                              <Input required type="text" readonly name="userName" id="userName" value={user.displayName} />
                             </Col>
                           </Row>
                           <Row>
@@ -362,16 +447,29 @@ export default class Sale extends Component {
                               <Label for="total">Pcio. Compra Total</Label>
                               <InputGroup>
                                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                <Input required type="number" readOnly value={this.state.grossTotal} name="grossTotal" id="grossTotal" />
+                                <Input required type="number" readOnly value={this.state.buyTotal} name="buyTotal" id="buyTotal" />
                               </InputGroup>
                               <Label for="total">Pcio. Venta Total</Label>
                               <InputGroup>
                                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
-                                <Input required type="number" readOnly value={this.state.netTotal} name="netTotal" id="netTotal" />
+                                <Input required type="number" readOnly value={this.state.saleTotal} name="saleTotal" id="saleTotal" />
                               </InputGroup>
+                            </Col>
+                            <Col>
+                              <FormGroup>
+                                <Label>% de Ganancia Total</Label>
+                                <InputGroup>
+                                  <Badge color={this.state.gain == 0 ? 'danger' : (this.state.gain >= 10 ? 'success' : 'warning')}>{this.state.gain}%</Badge>
+                                </InputGroup>
+                              </FormGroup>
                             </Col>
                           </Row>
                         </FormGroup>
+                        {
+                          this.state.itemsEdition.length
+                          ? <Button color='primary'>Guardar</Button>
+                          : <Button style={{cursor: 'not-allowed'}} color='primary' outline disabled>Guardar</Button>
+                        }
                       </Form>
                     </CardBody>
                   </Card>

@@ -48,12 +48,16 @@ class Admin extends Component {
 
 										<Route path={`${match.url}/register/product`} component={Producto} />
 
-										<Route path={`${match.url}/operation/buy`} component={Compra} />
+										<Route path={`${match.url}/operation/order`} component={Presupuesto} />
+										<Route path={`${match.url}/operation/buy`} render={() => (
+											<Compra user={user} />
+										)} />
 										<Route path={`${match.url}/operation/sale`} render={() => (
 											<Venta user={user} />
 										)} />
-										<Route path={`${match.url}/operation/order`} component={Presupuesto} />
-										<Route path={`${match.url}/operation/manual-registration`} component={RegistroManual} />
+										<Route path={`${match.url}/operation/manual-registration`} render={() => (
+											<RegistroManual user={user} />
+										)} />
 
 										<Route path={`${match.url}/report/stock`} component={Stock} />
 										<Route path={`${match.url}/report/orders`} component={Pedidos} />
