@@ -91,7 +91,8 @@ export default class Sale extends Component {
       _user: this.state._user,
       buyTotal: Number(this.state.buyTotal),
       saleTotal: Number(this.state.saleTotal),
-      gain: this.state.gain
+      gain: this.state.gain,
+      created: moment().valueOf()
     }
 
     firebase.database()
@@ -145,6 +146,7 @@ export default class Sale extends Component {
     const target = event.target
     const value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name
+    let length;
 
     //calcular % de ganancia
     if (name === '_salePrice') {
@@ -153,11 +155,11 @@ export default class Sale extends Component {
       let porcentaje =  Number(dif / value);
       let gain = porcentaje > 0 ? Number(
         Number(
-          value * porcentaje
+          porcentaje * 100
         ).toFixed(2)
       ) : 0;
 
-      this.state.itemsEdition[index].gain = gain;
+      this.state.itemsEdition[index].gain = Number(gain);
       this.forceUpdate()
     }
 
@@ -241,7 +243,7 @@ export default class Sale extends Component {
       let porcentaje =  Number(dif / ventas);
       let gain = porcentaje > 0 ? Number(
         Number(
-          ventas * porcentaje
+          porcentaje * 100
         ).toFixed(2)
       ) : 0;
 
@@ -390,7 +392,7 @@ export default class Sale extends Component {
                                         <Col>
                                           <FormGroup>
                                             <Label for="qty">Cantidad</Label>
-                                            <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._qty} type="number" name="_qty" id="qty" placeholder="Cantidad de unidades" />
+                                            <Input required onChange={(event) => {this.changeEdit(index, event)}} value={item._qty} type="number" min={-item.qty} name="_qty" id="qty" placeholder="Cantidad de unidades" />
                                             <Label for="price">Pcio. Compra</Label>
                                             <InputGroup>
                                               <InputGroupAddon addonType="prepend">$</InputGroupAddon>

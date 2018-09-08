@@ -42,7 +42,7 @@ render() {
           <Col md={3}>
           </Col>
           <Col md={3} sm={12}>
-            <Link to={`${match.url}/report/orders`}>
+            <Link to={`${match.url}/report/motions`}>
               <Card className='shadowHover' inverse color="info">
                 <CardBody>
                   <Row>
@@ -65,7 +65,7 @@ render() {
           </Col>
 
           <Col md={3} sm={12}>
-            <Link to={`${match.url}/report/stock`}>
+            <Link to={`${match.url}/report/products`}>
               <Card className='shadowHover' inverse color="danger">
                 <CardBody>
                   <Row>

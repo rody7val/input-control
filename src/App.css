@@ -8,7 +8,6 @@
 }
 .article{
 	max-width: 600px;
-	margin: 0 auto;
 }
 .nav-tabs .dropdown-toggle{
 	border-bottom-color: #007bff!important;
@@ -127,14 +126,17 @@ a {
     -webkit-transition: all .2s ease-in;
     transition: all .2s ease-in;
 }
-@media screen and (max-width: 575px){
-	.title{
-		text-align: left;
-	}
+.disabled{
+	cursor: not-allowed;
+}
+@media screen and (max-width: 990px){
 	body{
 		font-size: small
 	}
 	.marginLink{
 		margin-top: 0px;
+	}
+	.article{
+		margin: 0 auto;
 	}
 }

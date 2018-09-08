@@ -67,7 +67,7 @@ export default class ListItems extends React.Component {
 
   loadItems = () => {
     this.setState({loading: true})
-    firebase.database().ref('items')
+    firebase.database().ref('items/list')
       .orderByChild('name')
       .startAt(this.state.startAt)
       .limitToFirst(this.state.limit)
@@ -86,7 +86,7 @@ export default class ListItems extends React.Component {
                 <Row>
                   {
                     this.state.items.map((item, index) => (
-                      <Col key={index} md={12} className='article'>
+                      <Col key={index} md={12} lg={4} className='article'>
                         <ProductView  
                           name={item.name}
                           desc={item.desc}

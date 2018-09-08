@@ -13,17 +13,16 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      load: false,
       user: null
     }
   }
 
   componentDidMount() {
-    firebase.database()
-      .ref('load')
-      .on('value', snapshot => {
-        this.setState({ load: snapshot.val() })
-      })
+    // firebase.database()
+    //   .ref('load')
+    //   .on('value', snapshot => {
+    //     this.setState({ load: snapshot.val() })
+    //   })
   }
 
   componentWillMount() {
@@ -33,7 +32,7 @@ export default class App extends Component {
           .ref(`users/list/${user.uid}`)
           .on('value', snapshot => {
             if (snapshot.val() && snapshot.val().active) {
-              this.setState({load: false})
+              // this.setState({load: false})
               console.log('clear!')
             }
             user.admin = snapshot.val().admin
@@ -49,14 +48,14 @@ export default class App extends Component {
 
   auth(cb) {
     const provider = new firebase.auth.GoogleAuthProvider()
-    firebase.database().ref('load').set(true);
+    // firebase.database().ref('load').set(true);
     firebase.auth().signInWithPopup(provider)
       .then(result => {
         this.setState({user: result.user})
         cb()
       })
       .catch(error => {
-        firebase.database().ref('load').set(false);
+        // firebase.database().ref('load').set(false);
         console.log(`Error ${error.code}: ${error.message}`)
       })
   }
@@ -83,9 +82,7 @@ export default class App extends Component {
                 {
                   this.state.user ? (
                       <Route path="/admin" render={({match}) => (
-                        <Container style={{minHeight: '-webkit-fill-available'}}>
-                          <Admin match={match} user={this.state.user} />
-                        </Container> 
+                        <Admin match={match} user={this.state.user} />
                       )}/> 
                   ) : (
                     <Route path="/admin" component={_403} />
@@ -95,11 +92,6 @@ export default class App extends Component {
               </Switch>
             </div>
             
-            <Modal isOpen={this.state.load} >
-              <ModalBody>
-                <p className='lead'>Cargando...</p>
-              </ModalBody>
-            </Modal>
 
             <Footer/>
           </div>
@@ -132,3 +124,8 @@ const _403 = () => (
     }} color='primary'>Rigistrarme</Button></p>
   </Container>
 );
+            // <Modal isOpen={this.state.load} >
+            //   <ModalBody>
+            //     <p className='lead'>Cargando...</p>
+            //   </ModalBody>
+            // </Modal>

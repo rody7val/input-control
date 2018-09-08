@@ -25,13 +25,13 @@ export default class User extends React.Component {
         <Card className='shadow'>
           <CardBody>
             <Row>
-              <Col md={4}>
+              <Col md={3}>
                 <img src={this.state.user.photoURL} style={{
                   maxWidth: '100%',
                   borderRadius: '50%'
                 }} alt='img-user'/>
               </Col>
-              <Col md={8}>
+              <Col md={9}>
                 <p className='lead'>{this.state.user.displayName}</p>
                 <p className='lead'><b>{this.state.user.email}</b></p>
                 {

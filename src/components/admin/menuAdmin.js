@@ -1,7 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router-dom'
 import {
-	Nav,
+  Button,
+  Container,
+	Navbar,
+  Nav,
 	NavItem,
 	Dropdown,
 	DropdownItem,
@@ -40,15 +43,14 @@ import {
     });
   }
   render() {
-  	const { url } = this.props
+    const { url } = this.props
 
     return (
-      <div>
-        <Nav className='shadow' style={{backgroundColor: '#007bff', borderColor: '#007bff'}} tabs>
+      <Container>
+        <Nav>
           <NavItem>
             <Link className='nav-link' to={'/admin'}>Dashboard</Link>
           </NavItem>
-
           <Dropdown nav isOpen={this.state.dropdownOpen_1} toggle={this.toggle_1}>
             <DropdownToggle nav caret>
               Registrar
@@ -59,51 +61,53 @@ import {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-
           <Dropdown nav isOpen={this.state.dropdownOpen_2} toggle={this.toggle_2}>
             <DropdownToggle nav caret>
               Operación
             </DropdownToggle>
             <DropdownMenu>
               <DropdownItem>
-              	<Link to={`${url}/operation/buy`}>Compra</Link>
+                <Link className='disabled' to={`${url}/operation/buy`}>Compra</Link>
               </DropdownItem>
               <DropdownItem>
-              	<Link to={`${url}/operation/sale`}>Venta</Link>
+                <Link className='disabled' to={`${url}/operation/sale`}>Venta</Link>
               </DropdownItem>
               <DropdownItem>
-                <Link to={`${url}/operation/order`}>Presupuesto</Link>
+                <Link className='disabled' to={`${url}/operation/order`}>Presupuesto</Link>
               </DropdownItem>
               <DropdownItem>
                 <Link to={`${url}/operation/manual-registration`}>Registro Manual</Link>
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-
           <Dropdown nav isOpen={this.state.dropdownOpen_3} toggle={this.toggle_3}>
             <DropdownToggle nav caret>
               Informe
             </DropdownToggle>
             <DropdownMenu>
               <DropdownItem>
-              	<Link to={`${url}/report/stock`}>Stock</Link>
+                <Link to={`${url}/report/products`}>Productos</Link>
               </DropdownItem>
               <DropdownItem>
-                <Link to={`${url}/report/orders`}>Pedidos</Link>
+                <Link to={`${url}/report/motions`}>Movimientos</Link>
               </DropdownItem>
-            	<DropdownItem>
-            		<Link to={`${url}/report/motions/buy`}>Compras</Link>
-            	</DropdownItem>
               <DropdownItem>
-                <Link to={`${url}/report/motions/sale`}>Ventas</Link>
+                <Link to={`${url}/report/users`}>Usuarios</Link>
               </DropdownItem>
-            	<DropdownItem>
-            		<Link to={`${url}/report/users`}>Usuarios</Link>
-            	</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </Nav>
-      </div>
+      </Container>
     );
   }
 }
+
+              // <DropdownItem>
+                // <Link to={`${url}/operation/buy`}>Compra</Link>
+              // </DropdownItem>
+              // <DropdownItem>
+                // <Link to={`${url}/operation/sale`}>Venta</Link>
+              // </DropdownItem>
+              // <DropdownItem>
+                // <Link to={`${url}/operation/order`}>Presupuesto</Link>
+              // </DropdownItem>
